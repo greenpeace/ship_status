@@ -205,6 +205,14 @@ def receive_gps
       #puts "\e[31mParse error: #{sentence}\e[0m"
     end
   end
+  if res.has_key?("GGA")
+    begin
+      File.open("/var/www/watch/public/data/nmea.json","w") do |file|
+        file << res.to_json
+      end
+    rescue
+    end
+  end
 end
 
 def receive_wind
