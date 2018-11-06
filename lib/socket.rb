@@ -100,7 +100,7 @@ def log data
   else
     return
   end
-  header = ["time","lat","lon","hdg","cog","sog","stw","twa","tws","rwa","rws","avgs","gust","sds","avga","mina","maxa","sda","rtt","sdp","lss","dpt","alt","ber","bem"]
+  header = ["time","lat","lon","hdg","cog","sog","stw","twa","tws","rwa","rws","avgs","gust","sds","avga","mina","maxa","sda","dpt"]
   row = [lat,lon]
   if row.map{|l|l.round(precision)} == $pos.map{|l|l.round(precision)}
     if Time.now - $t0 >= 60
@@ -137,9 +137,11 @@ def log data
       row << data["MWV-t"]["max_angle"].round(2)
       row << data["MWV-t"]["std_dev_angle"].round(3)
 
+=begin
       row << data["PNG"]["rtt"].to_i
       row << data["PNG"]["sdp"].to_i
       row << data["PNG"]["lss"].round(2)
+=end
 
       if (data.has_key?("DPT") and data["DPT"].has_key?("depth_meters")) 
         row << (data["DPT"]["depth_meters"] + 2.1).round(1)
@@ -147,9 +149,11 @@ def log data
         row << nil
       end
 
+=begin
       row << data["PNG"]["alt"].round(2)
       row << data["PNG"]["ber"].round(2)
       row << data["PNG"]["bem"].to_i
+=end
 
       row.unshift Time.now.to_i
       File.open("/var/www/gauge/public/data/log.csv","a") do |file|
@@ -207,7 +211,7 @@ def receive_gps
   end
   if res.has_key?("GGA")
     begin
-      File.open("/var/www/watch/public/data/nmea.json","w") do |file|
+      File.open("/var/www/gauge/public/data/nmea.json","w") do |file|
         file << res.to_json
       end
     rescue
@@ -243,6 +247,7 @@ def receive_wind
         $res[mt] += 1
         if res.has_key?("HDT")
           mt = "MWV-t"
+          res[mt] = {'desc' => $dict[mt]}
           #$tws << (msg.wind_speed * 1.944).round(1)
           $tws << (msg.wind_speed).round(1)
           $twa << ((msg.wind_angle + res["HDT"]["true_heading_degrees"]) % 360).to_i
@@ -283,6 +288,7 @@ def receive_wind
   res["MWV-r"]["max_angle"] = $rwa.max
   res["MWV-r"]["std_dev_angle"] = $rwa.std_dev(true)
 
+=begin
   $rtt << $png["vsat"]["rtt"]
   $sdp << $png["vsat"]["sdp"]
   $lss << $png["vsat"]["lss"]
@@ -299,6 +305,7 @@ def receive_wind
   res["PNG"]["alt"] = sat["alt"].round(2)
   res["PNG"]["ber"] = (sat["az"].to_f - res["HDT"]["true_heading_degrees"] + 360 ).round(2) % 360
   res["PNG"]["bem"] = sat["id"].to_i
+=end
 
   if res.has_key?("MWV-r")
     begin
@@ -315,6 +322,7 @@ end
 
 loop do
   begin
+=begin
     pings = `ssh root@router.myez.gl3 -C "/usr/local/sbin/pfSsh.php playback gatewaystatus" | grep -P "none$"`.split(/[\r\n]+/)
     pings.each do |line|
       next unless line.match(/^(3G|VSAT_Ku)\s+/)
@@ -325,6 +333,7 @@ loop do
         "lss" => png[5].gsub(/\D/,"").to_f
       }
     end
+=end
     sleep 1
     receive_gps
     receive_wind
