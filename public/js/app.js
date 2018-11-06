@@ -159,14 +159,17 @@ function getBack() {
 function graticule() {
   L.latlngGraticule({
     showLabel: true,
-    color: "#666",
     zoomInterval: [
       {start: 2, end: 3, interval: 30},
       {start: 4, end: 5, interval: 10},
       {start: 6, end: 7, interval: 5},
-      {start: 8, end: 10, interval: 1},
+      {start: 8, end: 20, interval: 1},
       {start: 11, end: 12, interval: 0.5},
       {start: 13, end: 18, interval: 0.1}
+    ]
+  }).addTo(map);
+}
+
 var track_precision = 3;
 var window_focus = true;
 var iteration = 0
