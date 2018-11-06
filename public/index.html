@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!--[if IE 9 ]> <html class="ie9"> <![endif]-->
+<html>
+<head>
+<meta charset='utf-8'>
+<meta content='IE=edge' http-equiv='X-UA-Compatible'>
+<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<title>RW3 Dashboard</title>
+<!-- CSS -->
+<link href='/fonts/Material-Icons/material-icons.css' rel='stylesheet'>
+<link href='/css/main.css?676' media='screen,projection' rel='stylesheet' type='text/css'>
+<style>
+  .flex-grid {
+    display: flex;
+  }
+  .col {
+    flex: 1;
+  }
+  .nowrap > * {
+    white-space: no-wrap;
+  }
+  .rw3 {
+    background-image:url("/img/rw3.svg") !important;
+    transition: 1s !important;
+  }
+  .leaflet-control-scale-line {
+    background-color: transparent;
+  }
+  canvas.leaflet-zoom-animated { 
+    height: calc( 100% - 48px ) !important;
+  }
+  .svg.gauge {
+    width: 480px;
+    max-width: 100%;
+    height: 240px;
+  }
+  .svg.wind {
+    width: 480px;
+    max-width: 100%;
+    height: 240px;
+  }
+  #weather { text-align:center;}
+  #weather i { font-size: 32px;}
+  #weather span { font-size: 14px;}
+  #weather i.wi-wind { font-size: 42px; color:#aaa;}
+  li {
+    list-style-type: none;
+    padding-left:24px;
+  }
+  .inline > * {
+    display:inline;
+  }
+  li.large > *:not(h4) {
+    font-size:24px;
+  }
+  li > small {
+    font-size: 16px !important;
+    color: #666;
+  }
+  table.full { width: 100%; max-width: 100%; }
+  table.full tbody { width: 100%; }
+  table.full tbody tr { width: 100%; }
+  table.inline tbody td > * { display: inline; }
+  .svgwrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 280px;
+  }
+  #weather .leftie { text-align: left; font-size:24px; }
+  #weather .attr { font-size:16px;color:#666; }
+  #weather .huge { font-size:48px; }
+  #weather .middle { font-size:20px;margin:0; }
+  #weather .temp { font-size:36px; }
+  #weather .midicon { font-size:18px; margin-right:4px; }
+  #weather .windicon { font-size:64px !important; }
+  #weather span.wind { font-size:24px; }
+</style>
+<link href='/img/apple-touch-icon-152x152-precomposed.png' rel='apple-touch-icon-precomposed'>
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header>
+<div class='nav-mobile side-nav fixed' id='nav-mobile' style='padding: 0 !important;'>
+<div class='logo z-depth-1 m-b-20 green darken-4' style='max-height:48px;height:48px;'>
+<a class='button-back top-nav full' href='#' style=''>
+<i class='material-icons white-text medium'>arrow_back</i>
+</a>
+<div class='nav-wrapper'>
+<h5 style='color:white !important'>RW3 Dashboard</h5>
+</div>
+</div>
+<ul class='tabs'>
+<li class='tab'>
+<a href='#nmea'>Status</a>
+</li>
+<li class='tab'>
+<a href='#chart'>Chart</a>
+</li>
+<li class='tab'>
+<a href='#sky'>Sky</a>
+</li>
+<li class='tab'>
+<a href='#weather'>Weather</a>
+</li>
+<li class='tab'>
+<a href='#board'>Whiteboard</a>
+</li>
+</ul>
+</div>
+
+<div class='navbar-fixed'>
+<nav class='top-nav'>
+<a class='button-collapse top-nav full' data-activates='nav-mobile' href='#'>
+<i class='material-icons large'>menu</i>
+</a>
+<div class='nav-wrapper'>
+<h5 style='color:white !important'>&nbsp;</h5>
+</div>
+</nav>
+</div>
+</header>
+<main style='display:none;'>
+<div id='nmea'>
+<li class='content contonly large'>
+<div class='flex-grid'>
+<div class='col'>
+<b>COG:</b>
+<div class='nowrap'>
+<div id='COG'></div>
+°
+</div>
+</div>
+<div class='col'>
+<b>SOG:</b>
+<div class='nowrap'>
+<div id='SOG'></div>
+kn
+</div>
+</div>
+<div class='col'>
+<b>TWA:</b>
+<div class='nowrap'>
+<div id='TWA'></div>
+°
+</div>
+</div>
+<div class='col'>
+<b>HDG:</b>
+<div class='nowrap'>
+<div id='HDG'></div>
+°
+</div>
+</div>
+</div>
+<div class='flex-grid'>
+<div class='col'>
+<b>STW:</b>
+<div class='nowrap'>
+<div id='STW'></div>
+kn
+</div>
+</div>
+<div class='col'>
+<b>TWS:</b>
+<div class='nowrap'>
+<div id='TWS'></div>
+kn
+</div>
+</div>
+<div class='col'>
+<b>AWA:</b>
+<div class='nowrap'>
+<div id='AWA'></div>
+°
+</div>
+</div>
+<div class='col'>
+<b>AWS:</b>
+<div class='nowrap'>
+<div id='AWS'></div>
+kn
+</div>
+</div>
+</div>
+<div class='flex-grid'>
+<div class='col'>
+<div class='svgwrap'>
+<div class='svg wind' id='windspeed'></div>
+</div>
+</div>
+</div>
+<div class='flex-grid'>
+<div class='col'>
+<div class='svgwrap'>
+<div class='svg wind' id='windangle'></div>
+</div>
+</div>
+</div>
+<div class='flex-grid'>
+<div class='col'>
+<b>DPT:</b>
+<div class='nowrap'>
+<div id='DPT'></div>
+m
+</div>
+</div>
+</div>
+</li>
+</div>
+<div id='chart'>
+<div class='mapwrapper'>
+<div id='map'></div>
+</div>
+</div>
+<div class='sky' id='sky'>
+<li class='content contonly large'>
+<div class='row'>
+<div class='col s6 inline'>
+<br>
+<h4>Sun</h4>
+<br>
+<b>Dawn:</b>
+<div id='dawn'></div>
+<br>
+<b>Sunrise:</b>
+<div id='sunrise'></div>
+<small id='sunrise_az'></small>
+<br>
+<b>Noon:</b>
+<div id='noon'></div>
+<small id='noon_alt'></small>
+<br>
+<b>Sunset:</b>
+<div id='sunset'></div>
+<small id='sunset_az'></small>
+<br>
+<b>Dusk:</b>
+<div id='dusk'></div>
+<br>
+<br>
+</div>
+<div class='col s6 inline'>
+<br>
+<h4>Moon</h4>
+<br>
+<b>Moonrise:</b>
+<div id='moonrise'></div>
+<small id='moonrise_az'></small>
+<br>
+<b>Transit:</b>
+<div id='moon'></div>
+<small id='moon_alt'></small>
+<br>
+<b>Moonset:</b>
+<div id='moonset'></div>
+<small id='moonset_az'></small>
+<br>
+<b>Phase:</b>
+<div id='phase'></div>
+%
+<small id='waxing'></small>
+<br>
+<b>Full Moon:</b>
+<div id='full_moon'></div>
+<small id='fullmoon_left'></small>
+<br>
+<b>New Moon:</b>
+<div id='new_moon'></div>
+<small id='newmoon_left'></small>
+<br>
+</div>
+</div>
+</li>
+</div>
+<div class='weather' id='weather'>
+<div class='current'></div>
+<div class='forecast'></div>
+</div>
+<div id='board'>
+<div class='row'>
+<div class='col s12'>
+<div class='board'></div>
+</div>
+</div>
+<div class='row'>
+<div class='col s12'>
+<div class='write'>
+<textarea class='materialize-textarea' rows='5' style='background-color:white'></textarea>
+<button class='btn black right'>
+WRITE
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class='modal' id='modal'>
+<div class='modal-content'></div>
+</div>
+<script>
+  var domain = "//chart.myrw.gl3";
+</script>
+<script src='/js/main.js?1022'></script>
+<script src='/js/leaflet.graticule.js?389'></script>
+<script src='/js/svg.min.js?620'></script>
+<script src='/js/app.js?700' type='text/javascript'></script>
+</body>
+</html>

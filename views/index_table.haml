@@ -1,0 +1,221 @@
+-# coding: utf-8
+!!!
+/[if IE 9 ] <html class="ie9">
+%html
+  %head
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %meta{:content => "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no", :name => "viewport"}/
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title= @title ? "#{$title} | #{@title}" : $title
+    / CSS
+    %link{:href => "https://fonts.googleapis.com/icon?family=Material+Icons", :rel => "stylesheet"}/
+    -#%link{:href => "/fonts/Material-Icons/material-icons.css", :rel => "stylesheet"}/
+    %link{:href => "/css/main.css?#{rand(1024)}", :media => "screen,projection", :rel => "stylesheet", :type => "text/css"}/
+    :css
+      .rw3 {
+        background-image:url("/img/rw3.svg") !important;
+        transition: 1s !important;
+      }
+      .leaflet-control-scale-line {
+        background-color: transparent;
+      }
+      canvas.leaflet-zoom-animated { 
+        height: calc( 100% - 48px ) !important;
+      }
+      .svg {
+        width: 480px;
+        max-width: 100%;
+        height: 240px;
+      }
+      #weather { text-align:center;}
+      #weather i { font-size: 32px;}
+      #weather span { font-size: 14px;}
+      #weather i.wi-wind { font-size: 42px; color:#aaa;}
+      li {
+        list-style-type: none;
+        padding-left:24px;
+      }
+      .inline > * {
+        display:inline;
+      }
+      li.large > *:not(h4) {
+        font-size:24px;
+      }
+      li > small {
+        font-size: 16px !important;
+        color: #666;
+      }
+      table.full { width: 100%; max-width: 100%; }
+      table.full tbody { width: 100%; }
+      table.full tbody tr { width: 100%; }
+      table.inline tbody td > * { display: inline; }
+      .svgwrap {
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: 280px;
+      }
+      #weather .leftie { text-align: left; font-size:24px; }
+      #weather .attr { font-size:16px;color:#666; }
+      #weather .huge { font-size:48px; }
+      #weather .middle { font-size:20px;margin:0; }
+      #weather .temp { font-size:36px; }
+      #weather .midicon { font-size:18px; margin-right:4px; }
+      #weather .windicon { font-size:64px !important; }
+      #weather span.wind { font-size:24px; }
+
+    %link{:rel=>"apple-touch-icon-precomposed",:href=>"/img/apple-touch-icon-152x152-precomposed.png"}
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  %body
+    %header
+      =Haml::Engine.new(IO.read("#{Dir.pwd}/views/sidenav.haml")).render
+      .navbar-fixed
+        %nav.top-nav
+          %a.button-collapse.top-nav.full{"data-activates" => "nav-mobile", :href => "#"}
+            %i.material-icons.large menu
+          .nav-wrapper
+            %h5{:style=>"color:white !important"} &nbsp;
+
+    %main{:style=>"display:none;"}
+      #chart
+        .mapwrapper
+          #map
+
+      #nmea
+        %li.content.contonly.large
+          %table.full
+            %tbody
+              %tr
+                %td.inline
+                  %b HDG: 
+                  #HDG
+                  °
+                %td.inline
+                  %b STW: 
+                  #STW
+                  kn
+              %tr
+                %td.inline
+                  %b COG: 
+                  #COG
+                  °
+                %td.inline
+                  %b SOG: 
+                  #SOG
+                  kn
+              %tr
+                %td.inline
+                  %b AWA: 
+                  #AWA
+                  °
+                %td.inline
+                  %b AWS: 
+                  #AWS
+                  kn
+              %tr
+                %td.inline
+                  %b TWA: 
+                  #TWA
+                  °
+                %td.inline
+                  %b TWS: 
+                  #TWS
+                  kn
+              %tr
+                %td{:colspan=>2}
+                  .svgwrap
+                    #windspeed.svg
+              %tr
+                %td{:colspan=>2}
+                  .svgwrap
+                    #windangle.svg
+              %tr
+                %td.inline
+                  %b DPT: 
+                  #DPT
+                  m
+
+      #sky.sky
+        %li.content.contonly.large
+          .row
+            .col.s6.inline
+              %br/
+              %h4 Sun
+              %br/
+              %b Dawn: 
+              #dawn
+              %br/
+              %b Sunrise: 
+              #sunrise
+              %small#sunrise_az
+              %br/
+              %b Noon: 
+              #noon
+              %small#noon_alt
+              %br/
+              %b Sunset: 
+              #sunset
+              %small#sunset_az
+              %br/
+              %b Dusk: 
+              #dusk
+              %br/
+              %br/
+
+            .col.s6.inline
+              %br/
+              %h4 Moon
+              %br/
+              %b Moonrise: 
+              #moonrise
+              %small#moonrise_az
+              %br/
+              %b Transit: 
+              #moon
+              %small#moon_alt
+              %br/
+              %b Moonset: 
+              #moonset
+              %small#moonset_az
+              %br/
+              %b Phase:
+              #phase
+              = "%"
+              %small#waxing
+              %br/
+              %b Full Moon:
+              #full_moon
+              %small#fullmoon_left
+              %br/
+              %b New Moon:
+              #new_moon
+              %small#newmoon_left
+              %br/
+
+      #weather.weather
+        .current
+        .forecast
+
+      #board
+        .row
+          .col.s12
+            .board
+        .row
+          .col.s12
+            .write
+              %textarea.materialize-textarea{:rows=>5,:style=>"background-color:white"}
+              %button.btn.black.right
+                WRITE
+
+    #modal.modal
+      .modal-content
+
+    %script{:src => "/js/main.js?#{rand(1024)}"}
+    %script{:src => "/js/leaflet.graticule.js?#{rand(1024)}"}
+    %script{:src => "/js/svg.min.js?#{rand(1024)}"}
+    %script{:src => "/js/app.js?#{rand(1024)}", :type=>"text/javascript"}

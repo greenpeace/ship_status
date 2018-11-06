@@ -1,0 +1,5 @@
+/lib/.sass-cache
+/public/data/*
+.rvmrc
+Gemfile.lock
+

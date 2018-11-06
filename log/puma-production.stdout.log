@@ -1,0 +1,3 @@
+=== puma startup: 2018-09-27 16:27:03 +0000 ===
+* Listening on unix:///var/www/gauge/tmp/sockets/production.socket
+* Listening on tcp://0.0.0.0:9292

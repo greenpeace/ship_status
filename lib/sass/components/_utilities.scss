@@ -1,0 +1,423 @@
+body {background-color: #efefef;}
+
+.m-t-5  { display: block !important; margin-top: 5px !important; }
+.m-t-10 { display: block !important; margin-top: 10px !important; }
+.m-t-15 { display: block !important; margin-top: 15px !important; }
+.m-t-20 { display: block !important; margin-top: 20px !important; }
+.m-t-30 { display: block !important; margin-top: 30px !important; }
+.m-t-40 { display: block !important; margin-top: 40px !important; }
+.m-t-50 { display: block !important; margin-top: 50px !important; }
+
+.m-r-5  { display: block !important; margin-right: 5px !important; }
+.m-r-10 { display: block !important; margin-right: 10px !important; }
+.m-r-20 { display: block !important; margin-right: 20px !important; }
+.m-r-30 { display: block !important; margin-right: 30px !important; }
+.m-r-40 { display: block !important; margin-right: 40px !important; }
+.m-r-50 { display: block !important; margin-right: 50px !important; }
+
+.m-b-5  { display: block !important; margin-bottom: 5px !important; }
+.m-b-10 { display: block !important; margin-bottom: 10px !important; }
+.m-b-15 { display: block !important; margin-bottom: 15px !important; }
+.m-b-20 { display: block !important; margin-bottom: 20px !important; }
+.m-b-30 { display: block !important; margin-bottom: 30px !important; }
+.m-b-40 { display: block !important; margin-bottom: 40px !important; }
+.m-b-50 { display: block !important; margin-bottom: 50px !important; }
+
+.m-l-5  { display: block !important; margin-left: 5px !important; }
+.m-l-10 { display: block !important; margin-left: 10px !important; }
+.m-l-20 { display: block !important; margin-left: 20px !important; }
+.m-l-30 { display: block !important; margin-left: 30px !important; }
+.m-l-40 { display: block !important; margin-left: 40px !important; }
+.m-l-50 { display: block !important; margin-left: 50px !important; }
+
+.l-block {display: none;}
+.l-block.toggled {display: block;}
+
+.full-width { width: 100% !important; }
+.error {color: $error-color !important; }
+
+a { color: #ffa000; }
+a:hover { text-decoration: underline !important; }
+.side-nav a:hover, nav a:hover { text-decoration: none !important; }
+.side-nav .contact a:hover { text-decoration: underline !important; }
+
+.side-nav .collapsible-header, .side-nav.fixed .collapsible-header { padding: 0 32px; }
+nav {height: 48px;}
+nav .button-collapse i { font-size: 38px !important; line-height: 50px; }
+nav .brand-logo, .side-nav .brand-logo { max-width: 300px; margin: 0 0 0 48px; }
+
+header nav, main > *, footer > * {
+  padding: 0 !important;
+}
+
+main {
+  padding-left:300px;
+}
+
+.nav-mobile > li {
+  display: block;
+}
+
+.nav-mobile .nav-wrapper {
+  margin-left:24px;
+  cursor: default;
+}
+
+.nav-mobile .button-back {
+  display:none;
+}
+
+.tabs {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height:auto;
+}
+
+.tabs .tab {
+  display: block;
+  text-align: left;
+  margin-left: 24px;
+}
+
+.tabs .indicator {
+  display: none;
+}
+
+.nocursor, .nocursor * { cursor: default; }
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main { flex: 1 0 auto; }
+
+.side-nav .container { 
+  margin: 0 32px; 
+  width: calc( 100% - 64px );
+}
+
+.side-nav a.collapsible-header {
+  font-family: "Open Sans Condensed", sans-serif;
+  font-weight: 700;
+}
+
+.side-nav .button-back {
+  position:absolute; 
+  top: 6px; 
+  left: 18px;
+  padding:0;
+  i.medium {
+    font-size: 2.8rem;
+    line-height: 36px;
+  }
+}
+
+.side-nav .button-back, nav .button-collapse { 
+  transition: 0.2s;
+}
+
+.leaflet-top, .leaflet-bottom {
+  z-index: 990 !important;
+}
+
+.leaflet-control-attribution {
+  cursor: default;
+}
+
+ul.nav-mobile {
+  vertical-align: bottom;
+}
+.side-nav.fixed .collapsible-header.active {
+  background-color: #1b5e20 !important;
+}
+.side-nav.fixed .collapsible-body .collapsible-header.active {
+  background-color: #ccc !important;
+}
+
+.collab {
+  margin-left: 12px;
+}
+.collab span {
+  margin-left: -12px;
+}
+.leaflet-marker-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 32px;
+  border: 2px solid black !important;
+  background-color: #ccc !important;
+}
+
+.leaflet-marker-icon.orm b {
+  display:none;
+  background: transparent;
+  position: absolute;
+  bottom: -24px;
+  left: 10px;
+  width: 16px;
+  color: #FFF;
+  font-weight: 700;
+  font-size: 24px;
+  text-align: center;
+}
+
+.leaflet-marker-icon.flz { background-color: #cddc39 !important; background-image: url("/img/static/filiz.svg") !important; }
+.leaflet-marker-icon.fdn { background-color: #8bc34a !important; background-image: url("/img/static/fidan.svg") !important; }
+.leaflet-marker-icon.agc { background-color: #4caf50 !important; background-image: url("/img/static/agac.svg") !important; }
+.leaflet-marker-icon.orm { background-color: #1b5e20 !important; background-image: url("/img/static/orman.svg") !important }
+
+ul.side-nav li img { width: 100%; height: auto;}
+ul.side-nav li .copy { padding: 2px 32px 0; }
+ul.side-nav li .copy p {  line-height: 2em;}
+.side-nav li>a { color: #444; }
+.side-nav li>a.button-back:hover {background-color: transparent !important; color: #444; }
+.side-nav li>a {font-size: 18px; color: #444; }
+.nav-wrapper h5 { 
+  margin: 0;
+  line-height: 46px;
+  font-weight: 700;
+  color: #444;
+  font-size: 32px;
+  position: fixed;
+  left: 72px;
+}
+
+#slider {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 997;
+  transition: 0.2s;
+}
+
+#slider .range-field{
+  padding: 8px 12px;
+  background: white;
+}
+
+.clearfix {
+  overflow: visible;
+  zoom: 1;
+}
+
+.side-nav .bgimg {
+  width: 100% !important;
+  height: 100px !important;
+  background-size: cover;
+  background-position: center 70%;
+}
+
+.side-nav .carousel {
+  height: 100px !important;
+  margin-bottom: 18px !important;
+}
+
+.side-nav .carousel .carousel-cell {
+  padding: 0 8px 0 0 !important;
+  height: 100px !important;
+  width: auto !important;
+  min-height: 100px !important;
+}
+
+.side-nav img {
+  width: auto !important;
+  height: 100px !important;
+  cursor: pointer;
+}
+
+.side-nav .copy > img {
+  margin: 12px 0 -12px;
+}
+
+#modal .carousel {
+  height: 400px !important;
+}
+
+#modal .carousel-cell, #modal img {
+  width:100%;
+  height:auto;
+}
+
+.contonly .copy img:hover {
+  //transform: scale( 1.04 );
+}
+
+input[type=range]::-webkit-slider-thumb {
+	background-color: #9ccc65;
+	transition: 0.2s;
+}
+input[type=range]::-moz-range-thumb {
+	background-color: #9ccc65;
+	transition: 0.2s;
+}
+input[type=range]::-ms-thumb {
+	background-color: #9ccc65;
+	transition: 0.2s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+	transform: scale( 2 );
+}
+input[type=range]::-moz-range-thumb:hover {
+	transform: scale( 2 );
+}
+input[type=range]::-ms-thumb:hover {
+	transform: scale( 2 );
+}
+
+/***** These are to edit the thumb and the text inside the thumb *****/
+input[type=range] + .thumb {
+	background-color: #9ccc65;
+}
+input[type=range] + .thumb.active .value {
+	color: black;
+	font-weight: bold;
+}
+
+.logo-float {
+  position:fixed;
+  top:0;
+  right:0;
+  z-index: 998;
+  background-color: transparent;
+}
+.cekul-logo {
+  background-image: url("/img/static/cekul-logo-white.png");
+  background-size: cover;
+  height: 25px;
+  width: 92px;
+  margin: 13px 12px;
+}
+
+.agac-logo {
+  background-image: url("/img/static/7agac.png");
+  background-size: cover;
+  height: 92px;
+  width: 92px;
+  margin: 14px 12px;
+}
+
+.cekul-logo-uzun {
+  padding: 12px 32px;
+}
+
+.cekul-logo-uzun > div {
+  background-image: url("/img/static/cekul-logo.png");
+  background-size: 100%;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  width: 100% !important;
+  height: 48px !important;
+}
+
+.leaflet-bar a, .leaflet-bar a:hover {
+  background-color: #1b5e20 !important;
+  color: white !important;
+}
+.leaflet-bar a.leaflet-disabled, .leaflet-bar a.leaflet-disabled:hover {
+  color: #ba8 !important;
+}
+.leaflet-control-layers {
+  background-color: #1b5e20 !important;
+}
+.leaflet-control-layers-toggle {
+  background-image: url("/img/static/layers.svg") !important;
+}
+.leaflet-control.home-button a {
+  background-image: url("/img/boat.png") !important;
+	background-size: 80%;
+	cursor: pointer;
+}
+.leaflet-bar a {
+  background-color: #1b5e20 !important;
+  color: white !important;
+}
+
+.leaflet-bar a:hover {
+  color: #444 !important;
+}
+
+.leaflet-control-layers {
+  transition: 0.1s !important;
+}
+
+.leaflet-control-layers-expanded {
+  padding: 8px 12px 8px 8px;
+  background: #1b5e20 !important;
+  margin-right: 3px !important;
+  border: none !important;
+  box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.3) !important;
+}
+.leaflet-control-layers-expanded label {
+  color: #FFF !important;
+  text-align: center;
+  font-family: "Open Sans Condensed", "Open Sans", sans-serif;
+  font-size: 14px !important;
+  cursor: pointer;
+}
+
+
+.leaflet-control-layers-expanded label:hover {
+  color: #444 !important;
+}
+
+.navbar-fixed {
+  height: 48px !important;
+}
+
+
+@media only screen and (max-width : 992px) {
+  header, main, footer { padding-left: 0; }
+  .nav-mobile .nav-wrapper {
+    margin-left: 72px;
+  }
+
+  .nav-mobile .button-back {
+    display:block;
+  }
+
+  .tabs {
+    display: block;
+  }
+
+}
+
+@media #{$large-and-up} {
+  .hide-on-large-and-down { display: none; }
+  a.button-collapse { display: block !important; }
+}
+
+@media #{$medium-and-up} {
+  nav.nav-extended .nav-wrapper {
+    min-height: 48px;
+  }
+  nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
+    height: 48px;
+    line-height: 48px;
+  }
+  .navbar-fixed {
+    height: 48px;
+  }
+}
+
+@media only screen and (max-width : 600px) {
+  #weather { font-size: 16px !important;}
+  #weather i { font-size: 20px !important;}
+  #weather span { font-size: 10px !important;}
+  #weather i.wi-wind { font-size: 32px !important;}
+  #weather .leftie { text-align: center; font-size:14px; }
+  #weather .attr { font-size:12px;color:#666; }
+  #weather .hr3 { text-align: center; }
+  #weather .huge { font-size:42px !important; }
+  #weather .middle { font-size:14px;margin:0; }
+  #weather .temp { font-size:24px; }
+  #weather .midicon { font-size:12px; margin-right:4px; }
+  #weather i.wi-wind.windicon { font-size:52px !important; }
+  #weather span.wind { font-size:16px !important; }
+  .hide-on-small {display: none;}
+  li.large > :not(h4) { font-size: 18px !important; }
+}
+

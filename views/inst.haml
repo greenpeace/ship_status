@@ -1,0 +1,26 @@
+
+%p 
+  Günümüzde sosyal sorumluluk sahibi birçok şirket sivil toplum kuruluşlarıyla işbirliği yaparak 7 Ağaç Ormanlarını yeşertmeye devam ediyor. 7 Ağaç Ormanları kapsamında yapılan işbirliklerinin ÇEKÜL’ün amaçları doğrultusunda farklı projelerde alanında öncü kurumların destekleri ile sürdürülüyor.
+.row{:style=>"margin:0 -42px; "}
+  .col.s12.m12
+    %ul.collapsible.collapsible-accordion{"data-collapsible"=>"accordion"}
+      %li
+        %a.collapsible-header.waves-effect{:style=>'font-weight:800; padding: 0 42px; margin: 0 -10px; '} Devam Eden İşbirliklerimiz
+        .collapsible-body.copy.collab{:style=>'padding: 2px 42px 0;line-height: 2em'}
+          -$collabs[:cont].each do |col|
+            %span=col
+            %br/
+      %li
+        %a.collapsible-header.waves-effect{:style=>'font-weight:800; padding: 0 42px; margin: 0 -10px;'} Tamamlanan İşbirliklerimiz
+        .collapsible-body.copy.collab{:style=>'padding: 2px 42px 0;;line-height: 2em'}
+          -$collabs[:done].each do |col|
+            %span=col
+            %br/
+%p Kurumsal işbirlikleri için lütfen bizimle temasa geçiniz.
+%p.contact
+  %b{:style=>"color:#666;"}= $contact[:name]
+  %br/
+  =$contact[:phone]
+  &nbsp;
+  %a{:style=>'padding:0;',:href=>"mailto:#{$contact[:email]}"}= $contact[:email]
+

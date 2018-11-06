@@ -1,0 +1,145 @@
+*:focus {
+  outline: none;
+}
+.bold { font-weight: bold; }
+
+.right-text {text-align: right; }
+.left-text {text-align: left; }
+.center-text {text-align: center; }
+
+.show-medium { display: block; }
+.show-large { display: block; }
+
+@media (min-width : 795px) {
+  .show-medium { display: block; }
+  .show-large { display: none; }
+}
+
+@media (min-width : 993px) {
+  .show-medium { display: none !important; }
+  .show-large { display: block; }
+}
+
+.mapwrapper { 
+  position:relative; 
+  width: 100%; 
+  margin: 0 0 -50px;
+}
+.mapwrapper ul {position: relative}
+
+#map {
+	position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+#map a:hover { text-decoration: none !important; }
+
+
+.leaflet-marker-icon, .leaflet-marker-icon i {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  -webkit-transition: margin 0.2s;
+  -moz-transition: margin 0.2s;
+  -o-transition: margin 0.2s;
+  transition: margin 0.2s;
+} 
+a.camera, label.file { color: #009688 !important; cursor: pointer; }
+a.camera:hover, label.file:hover { color: #2196f3 !important; }
+#canvas {
+  display: none;
+}
+#vid {
+  display: none;
+  position: fixed;
+  top:0; right:0; bottom:0; left:0;
+  z-index: 12000;
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+#vid video {
+  width: 100%;
+  height: 100%;
+}
+
+#vid #snap, #vid #switch {
+  position: fixed; 
+  background-color: #009688;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+}
+
+#vid #snap:hover, #vid #switch:hover {
+  background-color: #2196f3;
+}
+
+#vid #snap {
+  bottom: 48px;
+  left: 50%;
+  margin: -32px -32px;
+  border-radius: 32px;
+  width:64px;
+  height:64px;
+  line-height: 86px;
+}
+
+#vid #switch {
+  display:none;
+  /*bottom: 48px;
+  right: calc(50% - 64px);
+  margin: -16px -16px;
+  border-radius: 16px;
+  width:32px;
+  height:32px;
+  line-height: 36px;*/
+}
+.sidebar canvas {
+  width: 100%;
+  height: 0px;
+  margin-bottom: 12px;
+  image-orientation: from-image;
+}
+a.camera, label.file {
+  margin-top: -14px;
+}
+label {font-weight: bold;}
+.conded {display:none;}
+.datum-action i {
+  cursor: pointer;
+}
+.datum-action i:hover {
+  color: black !important;
+}
+#datum-usure {
+  display: none;
+}
+.popupitem {
+  cursor: pointer;
+}
+
+.popupitem label{
+  cursor: pointer;
+  color: #808080;
+}
+
+.popupitem:hover label {
+  color: #000;
+}
+.modal {
+  max-height: 90% !important;
+}
+.leaflet-marker-icon {
+  transition: 0.2s;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
