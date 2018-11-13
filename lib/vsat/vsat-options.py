@@ -1,8 +1,8 @@
 import telnetlib, csv, re
 
-host = "175.176.240.1"
+host = "192.168.10.1"
 user = "admin"
-password = "@s0F1a*5"
+password = "P@55w0rd!"
 command = "options show"
 
 tn = telnetlib.Telnet()
@@ -17,6 +17,7 @@ tn.write(password + "\n")
 tn.write(command + "\n")
 tn.read_until("[SATELLITE", 1)
 ls = str.split("[SATELLITE"+tn.read_until("[SECURITY", 1),"\r\n\r\n")[0:-1]
+
 tn.write("exit\n")
 
 header = ["id"]

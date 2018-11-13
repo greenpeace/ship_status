@@ -36,7 +36,8 @@ dic = {"Koreasat 5":"KOREASAT 5", "NSS12":"NSS-12", "ST2":"ST-2",
 "APSTAR-9":"APSTAR 9", "JSAT":"", "T12Vantage":"TELSTAR 12V",
 "IS10-02":"INTELSAT 10-02", "Galaxy-25":"GALAXY 25",
 "JCSAT-110A":"N-SAT-110", "G25":"GALAXY 25", "IS907":"INTELSAT 907",
-"G28":"GALAXY 28", "APSTAR9":"APSTAR 9"}
+"G28":"GALAXY 28", "APSTAR9":"APSTAR 9", "IS905":"INTELSAT 905", 
+"T14R":"TELSTAR 14R", "IS35e":"INTELSAT 35E", "IS21":"INTELSAT 21"}
 
 pos = str.split(subprocess.check_output("tail -n 1 /var/www/gauge/public/data/track.csv", shell=True).strip(),",")
 
