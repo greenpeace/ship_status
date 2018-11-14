@@ -37,7 +37,9 @@ dic = {"Koreasat 5":"KOREASAT 5", "NSS12":"NSS-12", "ST2":"ST-2",
 "IS10-02":"INTELSAT 10-02", "Galaxy-25":"GALAXY 25",
 "JCSAT-110A":"N-SAT-110", "G25":"GALAXY 25", "IS907":"INTELSAT 907",
 "G28":"GALAXY 28", "APSTAR9":"APSTAR 9", "IS905":"INTELSAT 905", 
-"T14R":"TELSTAR 14R", "IS35e":"INTELSAT 35E", "IS21":"INTELSAT 21"}
+"T14R":"TELSTAR 14R", "IS35e":"INTELSAT 35E", "IS21":"INTELSAT 21",
+"IS902":"INTELSAT 902", "IS17":"INTELSAT 17"
+}
 
 pos = str.split(subprocess.check_output("tail -n 1 /var/www/gauge/public/data/track.csv", shell=True).strip(),",")
 
@@ -98,15 +100,15 @@ with open('vsat-options.csv', 'rb') as data:
         errs.append(row[0])
 
 print ""
-print "Satellite coverage report for RW on \033[0;33m"+dd2dms(pos[1],"NS")+" "+dd2dms(pos[2],"EW")+"\033[0;0m as of \033[0;33m"+str(datetime.datetime.now())[0:19]+"\033[0;0m"
+print "Satellite coverage report for MYEZ on \033[0;33m"+dd2dms(pos[1],"NS")+" "+dd2dms(pos[2],"EW")+"\033[0;0m as of \033[0;33m"+str(datetime.datetime.now())[0:19]+"\033[0;0m"
 str(datetime.datetime.fromtimestamp(float(pos[0])))
 
 if len(errs) > 0:
   print "Could not locate beams \033[1;31m"+(", ").join(errs)+".\033[0;0m"
 
 print ""
-print " id       lon   (±delta)      lat     range    azimuth   altitude       name  beam_name"
-print "======================================================================================="
+print "  id       lon   (±delta)      lat     range    azimuth   altitude       name  beam_name"
+print "========================================================================================"
 
 sats.sort(key=lambda x: x["alt"], reverse=True)
 
@@ -114,10 +116,10 @@ with open("/var/www/gauge/public/data/sat.json","w") as file:
   json.dump(sats, file)
 
 for sat in sats:
-  color = "\033[1;%sm" % (32 if sat["alt"] == maxalt else (36 if sat["alt"] > 60 else (34 if sat["alt"] > 45 else (30 if sat["alt"] < 0 else 0))))
+  color = "\033[1;%sm" % (32 if sat["id"] == chosen else (36 if sat["alt"] > 30 else (34 if sat["alt"] > 15 else (30 if sat["alt"] < 0 else 0))))
   print(" %s%s   %s%s (%s)%s  %s%s%s  %s  %s  %s  %s  %s\033[0;0m" % (
     color,
-    sat["id"],
+    sat["id"].ljust(4),
     fpad(sat["sublon"]),
     "\033[1;31m" if abs(sat["londelta"]) > treshold else "",
     re.sub(r"\s","+",fpad(sat["londelta"],6)),
