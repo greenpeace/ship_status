@@ -322,6 +322,7 @@ function popSVG(type,data,max,period,elem) {
   avgmin = "";
   avgmax = "";
   gust = "";
+  if (type == "sog") console.log(data)
   if (max > 0) {
     ratio = 200 / parseFloat(max);
   } else {
