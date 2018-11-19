@@ -110,10 +110,10 @@ def log data
 
       if data.has_key?("RMC")
         row << data["RMC"]["track_made_good_degrees_true"].round(1) 
-        row << data["RMC"]["speed_over_ground_knots"].round(1) if data.has_key?("RMC")
+        row << data["RMC"]["speed_over_ground_knots"].round(1)
       elsif data.has_key?("VTG")
         row << data["VTG"]["track_degrees_true"].round(1) 
-        row << data["VTG"]["speed_knots"].round(1) if data.has_key?("RMC")
+        row << data["VTG"]["speed_knots"].round(1)
       else
         row << ""
         row << ""
