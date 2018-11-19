@@ -249,8 +249,14 @@ def receive_wind
           mt = "MWV-t"
           res[mt] = {'desc' => $dict[mt]}
           #$tws << (msg.wind_speed * 1.944).round(1)
-          $tws << (msg.wind_speed).round(1)
+          if res.has_key?("VTG")
+            $tws << add_polar_vectors([[msg.wind_angle,msg.wind_speed], [res["VTG"]["track_degrees_true"], res["VTG"]["speed_knots"]]])[1].round(1)
+          else
+            $tws << msg.wind_angle
+          end
           $twa << ((msg.wind_angle + res["HDT"]["true_heading_degrees"]) % 360).to_i
+          p $tws
+          p $twa
           $tws.shift while $tws.length > $avg_period
           $twa.shift while $twa.length > $avg_period
           $res[mt] += 1
@@ -318,6 +324,30 @@ def receive_wind
       log res
     end
   end
+end
+
+def polar2cart a, r=nil
+  a, r = *a unless r
+  x = Math.cos( a / 180.0 * Math::PI ) * r
+  y = Math.sin( a / 180.0 * Math::PI ) * r
+  [x,y]
+end
+
+def cart2polar x, y=nil
+  x, y = *x unless y
+  a = Math.atan2(y, x) * 180.0 / Math::PI
+  r = ( x * x + y * y ) ** 0.5
+  [a,r]
+end
+
+def add_polar_vectors a
+  x, y = 0, 0
+  a.each do |v|
+    c = polar2cart v
+    x += c[0]
+    y += c[1]
+  end
+  cart2polar [x,y]
 end
 
 loop do

@@ -51,8 +51,8 @@ $description = "Let the crew know \"where the fuck they are!\""
 
 def parse_csv type, period
   type.downcase!
-  radial = {"hdg"=>3,"cog"=>4,"alt"=>22,"ber"=>23}
-  scalar = {"sog"=>5,"stw"=>6,"tws"=>8,"rtt"=>18,"lss"=>20,"dpt"=>21}
+  radial = {"hdg"=>3,"cog"=>4,"alt"=>22,"ber"=>23,"rwa"=>9}
+  scalar = {"sog"=>5,"stw"=>6,"tws"=>8,"rws"=>10,"rtt"=>18,"lss"=>20,"dpt"=>21}
   scope = period * 60
   batch = (scope / 480.0).round
   batch == 0 ? batch = 1 : batch = batch

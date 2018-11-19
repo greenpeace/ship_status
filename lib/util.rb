@@ -42,3 +42,45 @@ module Enumerable
 
 end 
 
+def polar2cart a, r=nil
+  a, r = *a unless r
+  x = Math.cos( a / 180.0 * Math::PI ) * r
+  y = Math.sin( a / 180.0 * Math::PI ) * r
+  [x,y]
+end
+
+def cart2polar x, y=nil
+  x, y = *x unless y
+  a = Math.atan2(y, x) * 180.0 / Math::PI
+  r = ( x * x + y * y ) ** 0.5
+  [a,r]
+end
+
+def add_polar_vectors a
+  x, y = 0, 0
+  a.each do |v|
+    c = polar2cart v
+    x += c[0]
+    y += c[1]
+  end
+  cart2polar [x,y]
+end
+
+def fix_log_file
+  new = []
+  CSV.read("#{Dir.pwd}/public/data/log.csv").each_with_index do |row,ind|
+    if row[5]
+      row[8] = add_polar_vectors([[row[4],row[5]],[row[9],row[10]]])
+      new << row
+    else
+      new << row
+    end
+  end
+  CSV.open("#{Dir.pwd}/public/data/log.csv","w") do |csv|
+    new.each do |row|
+      csv << row
+    end
+  end
+  nil
+end
+

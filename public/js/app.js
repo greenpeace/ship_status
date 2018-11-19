@@ -328,7 +328,7 @@ function popSVG(type,data,max,period,elem) {
   } else {
     ratio = 1 / 1.8;
   }
-  color = radial = {"hdg":"#06c","cog":"#0c6","sog":"#c60","stw":"#6c0","tws":"#c06","twa":"#60c","dpt":"#006"}[type]
+  color = radial = {"hdg":"#06c","cog":"#0c6","sog":"#c60","stw":"#6c0","tws":"#c06","twa":"#60c","aws":"#f0a","awa":"#a0f","dpt":"#006"}[type]
   color == "#" ? color = "#000" : color = color;
   delta = ($("#nav-mobile").css("transform") == "matrix(1, 0, 0, 1, 0, 0)" ? 418 : 118);
   width = Math.max(window.innerWidth - delta, 480);
