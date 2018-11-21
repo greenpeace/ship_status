@@ -250,7 +250,7 @@ def receive_wind
           res[mt] = {'desc' => $dict[mt]}
           #$tws << (msg.wind_speed * 1.944).round(1)
           if res.has_key?("VTG")
-            $tws << add_polar_vectors([[msg.wind_angle,msg.wind_speed], [res["VTG"]["track_degrees_true"], res["VTG"]["speed_knots"]]])[1].round(1)
+            $tws << add_polar_vectors([[msg.wind_angle,msg.wind_speed], [res["VTG"]["track_degrees_true"]-180, res["VTG"]["speed_knots"]]])[1].round(1)
           else
             $tws << msg.wind_angle
           end

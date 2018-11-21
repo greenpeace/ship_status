@@ -35,7 +35,7 @@ function initMap() {
   map.removeControl(map.zoomControl)
   L.control.zoom({position: 'topright'}).addTo(map);
   map.removeControl(map.attributionControl)
-  L.control.attribution({position: 'bottomright',prefix: '<strong>MY Rainbow Warrior</strong> | Strictly not for navigation'}).addTo(map);
+  L.control.attribution({position: 'bottomright',prefix: '<strong>Esperanza</strong> | Strictly not for navigation'}).addTo(map);
   //L.control.attribution({position: 'bottomright',prefix: '<strong>MY Rainbow Warrior</strong> | <a href="//leafletjs.com" title="A JS library for interactive maps">Leaflet</a>'}).addTo(map);
 
   map.addControl(new L.Control.ScaleNautic({
