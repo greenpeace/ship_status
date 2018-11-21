@@ -255,8 +255,6 @@ def receive_wind
             $tws << msg.wind_angle
           end
           $twa << ((msg.wind_angle + res["HDT"]["true_heading_degrees"]) % 360).to_i
-          p $tws
-          p $twa
           $tws.shift while $tws.length > $avg_period
           $twa.shift while $twa.length > $avg_period
           $res[mt] += 1
