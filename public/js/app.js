@@ -1,4 +1,4 @@
-var map, zoomInit, index, markercluster, fStatic, fDynamic, rw3, rw3raw, rw3s, warrow, carrow, harrow, wlin, wake, rot, angle, speed, weather, timedelta, POS, SVGdata, SVGdata2, edge;
+var map, zoomInit, index, markercluster, fStatic, fDynamic, rw3, rw3raw, rw3s, warrow, carrow, harrow, wlin, wake, rot, angle, speed, weather, timedelta, POS, SVGdata, SVGdata2, edge, sats, sm;
 var overlays = {};
 var overids = {};
 var fitBoundOpts = {animate:true};
@@ -8,7 +8,7 @@ var basemap = L.tileLayer('/tiles/chart/{z}/{x}/{y}.png', {attribution: '', minZ
 //var openseamap = L.tileLayer.provider('OpenSeaMap', {minZoom: 4, maxZoom: 18, apikey:"819dee1c8f874141ad1f7cec78d2efc5"});
 
 $.get("/img/rw3.svg",function(img) {
-  rw3raw = img.rootElement.outerHTML;
+  rw3raw = "<g> "+img.rootElement.outerHTML+" </g>";
 })
 
 Number.prototype.mod = function(n) {
@@ -266,17 +266,23 @@ function drawGauge() {
     harrow.line(0,0,0,-edge*0.5).stroke({color:"#060",width:3,linecap:"round"})
     carrow = gg.group();
     carrow.line(0,0,0,-edge*0.5).stroke({color:"#c60",width:3,linecap:"round"})
-    circles = 4
+    circles = 6
     for (var i=0; i <= circles; i++) {
-      dt = edge * i / circles;
-      gg.circle(dt).center(0,0).fill("none").stroke({color:"#06c",width:2});
+      dt = edge * Math.cos( i / (circles * 2) * Math.PI )
+      gg.circle(dt).center(0,0).fill("none").stroke({color:"#06c",width:i == 0 ? 2 : i / 2 - 0.5});
     }
     for (var i=0; i < 360; i++) {
       gg.line(0,-edge*0.5,0,(i%15 == 0 ? -edge*0.46 : -edge*0.48)).stroke({color:"#06c",width:(i%5 == 0 ? 0.6 : 0.3) }).rotate(i,0,0);
     }
     lines = 4;
-    fsize = edge * 0.04;
+    //fsize = edge * 0.04;
     for (var i=0; i < lines; i++) {
+      //rng = i % 2 == 0 ? 0.5 : 0.4
+      //fs = i % 2 == 0 ? 12 : 10
+      //gg.polygon(edge*0.02+",0 0,"+edge*rng+" "+(-edge*0.02)+",0 0,"+(-edge*rng)).center(0,0).fill("#ddd").stroke({color:"#06c",width:edge * 0.004 }).rotate(180*i/lines,0,0);
+      //gg.polygon(edge*0.02+",0 0,"+edge*rng+" 0,"+(-edge*rng)+" "+(-edge*0.02)+",0" ).center(0,0).fill("#06c").stroke("none").rotate(180*i/lines,0,0);
+      //gg.text(pad(180*i/lines,3)).font({size:fs,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180*i/lines,0,0);
+      //gg.text(pad(180+180*i/lines,3)).font({size:fs,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180+180*i/lines,0,0);
       gg.line(0,edge*0.5,0,-edge*0.5).center(0,0).stroke({color:"#06c",width:1.2}).rotate(180*i/lines,0,0);
       gg.text(pad(180*i/lines,3)).font({size:12,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180*i/lines,0,0);
       gg.text(pad(180+180*i/lines,3)).font({size:12,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180+180*i/lines,0,0);
@@ -295,14 +301,38 @@ function drawGauge() {
 
     gg.svg(rw3raw);
     rw3s = SVG.get("rw3");
-    rw3s.center(0,0).scale(edge/200,0,0);
-    //rw3s.center(0,0);
-    rw3s.rotate(hdg,0,0);
-    //$("#rw3").css("transform","rotate( "+hdg+"deg )")
+    rw3s.scale(edge/200,0,0);
+    //rw3s.children()[0].attr("transform","translate(0,0)")
+    //rw3s.rotate(hdg,0,0);
+    //rw3s.children()[0].attr("transform","rotate("+hdg+",0,0)")
+    rw3s.children()[0].children()[0].rotate(hdg,0,0);
     carrow.rotate(cog,0,0);
     harrow.rotate(hdg,0,0);
+
+    satg = gg.group();
+    $.each(sats,function(i,e){
+      if (e.alt > 0) {
+        block = Math.min(Math.floor(Math.min(Math.abs(151 - (e.az - hdg) % 360),e.alt) / 2), 10);
+        scale = ["#F5001A", "#F31F08", "#F2560F", "#F18A17", "#F0B91F", "#EFE527", "#CFEE2F", "#A9ED36", "#86EC3E", "#67EB45", "#4CEA4E"]
+        color = scale[block]
+        sat = satg.circle(8)
+          .attr("data-beam",e.beamname)
+          .attr("data-id",e.id)
+          .attr("class","sat")
+          .center(0,-0.5 * edge * Math.cos(e.alt / 180 * Math.PI))
+          .rotate(parseInt(e.az),0,0)
+          .fill(color)
+          .stroke({color: "#000", width:e.active == 1 ? 2 : 0.2})
+      }
+    })
+    if (sm.sun.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.sun.alt/180*Math.PI)).rotate(parseInt(sm.sun.az),0,0).fill("#FC8").stroke({color:"#FFC",width:2});
+    if (sm.moon.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.moon.alt/180*Math.PI)).rotate(parseInt(sm.moon.az),0,0).fill("#AAA").stroke({color:"#CCC",width:2});
+
   } else {
-    rw3s.rotate(hdg,0,0);
+    //rw3s.rotate(hdg,0,0);
+    rw3s.children()[0].children()[0].rotate(hdg,00,00);
+    //rw3s.attr("transform","rotate("+hdg+",0,0)")
+    //rw3s.children()[0].attr("transform","rotate("+hdg+",0,0)")
     carrow.rotate(cog,0,0);
     harrow.rotate(hdg,0,0);
     warrow.rotate(twa,0,0);
@@ -311,6 +341,10 @@ function drawGauge() {
     //warrow.animate().rotate(twa,0,0);
   }
 }
+
+
+
+
 
 
 
@@ -504,6 +538,11 @@ $(document).ready(function(){
   $('select').material_select();
   $("main").show();
 
+  $("svg#gauge").on("mouseover","circle.sat",function(){
+    console.log("yay");
+    console.log($(this).data("id"));
+  })
+
   $(window).on("resize",function(){
     $("#gauge").html("").removeClass("hide");
     $(".mapwrapper, #map").css("height", window.innerHeight -48);
@@ -537,9 +576,14 @@ $(document).ready(function(){
     })
   })
 
+  $.getJSON(domain+"/data/sunmoon.json?"+new Date().getTime(),function(data){
+    sm = data;
+  })
+
   $.getJSON(domain+"/data/sat.json?"+new Date().getTime(),function(data){
     tb = $("#sky tbody");
     tb.html("");
+    sats = data;
     $.each(data,function(k,v){
       dist = String(parseInt(v["range"]/1000));
       vv = [v["id"],v["satname"],/*v["beamname"],*/v["sublat"].toFixed(2),v["sublon"].toFixed(2)+" ("+v["catlon"]+")",v["alt"].toFixed(2),v["az"].toFixed(2),dist.substr(0,2)+","+dist.substr(2,3)]
