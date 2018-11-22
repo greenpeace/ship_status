@@ -35,7 +35,7 @@ function initMap() {
   map.removeControl(map.zoomControl)
   L.control.zoom({position: 'topright'}).addTo(map);
   map.removeControl(map.attributionControl)
-  L.control.attribution({position: 'bottomright',prefix: '<strong>MY Rainbow Warrior</strong> | Strictly not for navigation'}).addTo(map);
+  L.control.attribution({position: 'bottomright',prefix: '<strong>Esperanza</strong> | Strictly not for navigation'}).addTo(map);
   //L.control.attribution({position: 'bottomright',prefix: '<strong>MY Rainbow Warrior</strong> | <a href="//leafletjs.com" title="A JS library for interactive maps">Leaflet</a>'}).addTo(map);
 
   map.addControl(new L.Control.ScaleNautic({
@@ -322,12 +322,13 @@ function popSVG(type,data,max,period,elem) {
   avgmin = "";
   avgmax = "";
   gust = "";
+  if (type == "sog") console.log(data)
   if (max > 0) {
     ratio = 200 / parseFloat(max);
   } else {
     ratio = 1 / 1.8;
   }
-  color = radial = {"hdg":"#06c","cog":"#0c6","sog":"#c60","stw":"#6c0","tws":"#c06","twa":"#60c","dpt":"#006"}[type]
+  color = radial = {"hdg":"#06c","cog":"#0c6","sog":"#c60","stw":"#6c0","tws":"#c06","twa":"#60c","aws":"#f0a","awa":"#a0f","dpt":"#006"}[type]
   color == "#" ? color = "#000" : color = color;
   delta = ($("#nav-mobile").css("transform") == "matrix(1, 0, 0, 1, 0, 0)" ? 418 : 118);
   width = Math.max(window.innerWidth - delta, 480);

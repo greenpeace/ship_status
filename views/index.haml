@@ -188,7 +188,7 @@
                   .nowrap
                     %span#AWS
 
-              .flex-grid
+              -#.flex-grid
                 .col
                   %b DPT: 
                   .nowrap
@@ -201,14 +201,16 @@
                       %option{:value=>"tws", :selected=>true} True Wind Speed
                       %option{:value=>"twa"} True Wind Angle
                       %option{:value=>"sog"} Speed Over Ground
-                      %option{:value=>"stw"} Speed Through Water
+                      -#%option{:value=>"stw"} Speed Through Water
                       %option{:value=>"cog"} Course Over Ground
                       %option{:value=>"hdg"} Heading
-                      %option{:value=>"dpt"} Depth
-                      %option{:value=>"rtt"} Ping time
-                      %option{:value=>"lss"} Packet loss %
-                      %option{:value=>"ber"} Sat bearing
-                      %option{:value=>"alt"} Sat altitude
+                      %option{:value=>"aws"} Apparent Wind Speed
+                      %option{:value=>"awa"} Apparent Wind Angle
+                      -#%option{:value=>"dpt"} Depth
+                      -#%option{:value=>"rtt"} Ping time
+                      -#%option{:value=>"lss"} Packet loss %
+                      -#%option{:value=>"ber"} Sat bearing
+                      -#%option{:value=>"alt"} Sat altitude
                     %label Reading
                 .col2
                   .input-field
@@ -217,14 +219,16 @@
                       %option{:value=>"tws"} True Wind Speed
                       %option{:value=>"twa"} True Wind Angle
                       %option{:value=>"sog"} Speed Over Ground
-                      %option{:value=>"stw"} Speed Through Water
+                      -#%option{:value=>"stw"} Speed Through Water
                       %option{:value=>"cog"} Course Over Ground
                       %option{:value=>"hdg"} Heading
-                      %option{:value=>"dpt"} Depth
-                      %option{:value=>"rtt"} Ping time
-                      %option{:value=>"lss"} Packet loss %
-                      %option{:value=>"ber"} Sat bearing
-                      %option{:value=>"alt"} Sat altitude
+                      %option{:value=>"aws"} Apparent Wind Speed
+                      %option{:value=>"awa"} Apparent Wind Angle
+                      -#%option{:value=>"dpt"} Depth
+                      -#%option{:value=>"rtt"} Ping time
+                      -#%option{:value=>"lss"} Packet loss %
+                      -#%option{:value=>"ber"} Sat bearing
+                      -#%option{:value=>"alt"} Sat altitude
                     %label Secondary
                 .col
                   .input-field
