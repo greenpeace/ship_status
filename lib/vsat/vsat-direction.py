@@ -112,6 +112,9 @@ print "=========================================================================
 
 sats.sort(key=lambda x: x["alt"], reverse=True)
 
+with open("/var/www/gauge/lib/vsat/active.json","w") as file:
+  file.write(str(chosen))
+
 with open("/var/www/gauge/public/data/sat.json","w") as file:
   json.dump(sats, file)
 
