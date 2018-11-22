@@ -322,7 +322,7 @@ function popSVG(type,data,max,period,elem) {
   avgmin = "";
   avgmax = "";
   gust = "";
-  if (type == "sog") console.log(data)
+  //if (type == "sog") console.log(data)
   if (max > 0) {
     ratio = 200 / parseFloat(max);
   } else {
@@ -413,7 +413,7 @@ function popSVG(type,data,max,period,elem) {
   } else if (type == "twa") {
     svgelem.polygon(avgmin + avgmax.split(" ").reverse().join(" ")).fill(color).stroke({color:color,width:0}).attr("fill-rule","evenodd")
   } else if (max > 0){
-    svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,380);
+    svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,480);
   } else {
     svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,380);
   }
