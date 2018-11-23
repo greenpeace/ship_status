@@ -250,12 +250,12 @@ function drawGauge() {
   cog = parseInt($("#COG").text().replace(/[^\d\.]/,""));
   twa = parseInt($("#TWA").text().replace(/[^\d\.]/,""));
   if ($("#rw3").length == 0 ) {
-    edge = $("#data-container").height() - 6;
-    if (window.innerWidth < 666) {
-      $("#gauge-container").removeClass("col");
-      return false;
+    if (window.innerWidth >= 559) {
+      edge = $("#data-container").height() - 6;
+    } else {
+      edge = window.innerWidth - 48;
     }
-      $("#gauge-container").addClass("col");
+    $("#gauge-container").addClass("col");
     $("#gauge-container").css("width",edge+6).css("height",edge+6).css("min-width",edge+6).css("min-height",edge+6).css("max-width",edge+6).css("max-height",edge+6);
     $("#gauge").html("").removeClass("hide");
     gauge = SVG("gauge").size(edge+6,edge+6);
@@ -266,6 +266,7 @@ function drawGauge() {
     harrow.line(0,0,0,-edge*0.5).stroke({color:"#060",width:3,linecap:"round"})
     carrow = gg.group();
     carrow.line(0,0,0,-edge*0.5).stroke({color:"#c60",width:3,linecap:"round"})
+    gg.circle(edge).attr("id","base").center(0,0).fill("transparent").stroke("none");
     circles = 6
     for (var i=0; i <= circles; i++) {
       dt = edge * Math.cos( i / (circles * 2) * Math.PI )
@@ -274,6 +275,7 @@ function drawGauge() {
     for (var i=0; i < 360; i++) {
       gg.line(0,-edge*0.5,0,(i%15 == 0 ? -edge*0.46 : -edge*0.48)).stroke({color:"#06c",width:(i%5 == 0 ? 0.6 : 0.3) }).rotate(i,0,0);
     }
+
     lines = 4;
     //fsize = edge * 0.04;
     for (var i=0; i < lines; i++) {
@@ -558,11 +560,6 @@ $(document).ready(function(){
   $('select').material_select();
   $("main").show();
 
-  $("svg#gauge").on("mouseover","circle.sat",function(){
-    console.log("yay");
-    console.log($(this).data("id"));
-  })
-
   $(window).on("resize",function(){
     $("#gauge").html("").removeClass("hide");
     $(".mapwrapper, #map").css("height", window.innerHeight -48);
@@ -675,21 +672,21 @@ $(document).ready(function(){
     delta = time.getTimezoneOffset()
     wtime = new Date(data.dt * 1000 + (timedelta * 60 + delta) * 60000);
     html = "<div class='flex-grid'>"
-    html += "<div class='col nobg'>&nbsp;</div>\n"
-    html += "<div class='col2 nobg'>\n"
+    //html += "<div class='col nobg'>&nbsp;</div>\n"
+    html += "<div class='col nobg'>\n"
     html += "<p class='leftie'>"+data.name+", "+data.sys.country+"<br/>\n"
     html += "<b>"+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][wtime.getDay()]+" "+["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][wtime.getMonth()]+"&nbsp;"+wtime.getDate()+", </b>\n"
     html += "<b>"+wtime.getHours()+":"+(wtime.getMinutes() == 0 ? "00" : wtime.getMinutes())+"</b><br/><small class='attr'>openweathermap.org</small></p>\n"
     html += "</div>\n"
-    html += "<div class='col2'>\n"
-    html += "<p><br/><i class='huge wi wi-owm-"+data.weather[0].id+"'></i><br/><span style='margin-top:12px;display:block;'>"+data.weather[0].description+"</span></p>"
+    html += "<div class='col2 nobg'>\n"
+    html += "<p><br/><i class='huge wi wi-owm-"+data.weather[0].id+"'></i><br/><span style='margin-top:12px;display:block;'>"+data.weather[0].description+"</span><br/><i title='Cloud cover' class='midicon wi wi-cloud'></i>"+Math.round(data.clouds.all)+"<small>%</small></p>"
     html += "</div>\n"
-    html += "<div class='col2'>\n"
+    html += "<div class='col2 nobg'>\n"
     html += "<p class='middle'><br/><b class='temp'>"+Math.round(data.main.temp)+"°C</b><br/>"+Math.round(data.main.pressure)+"<span>hPa</span>\n"
-    html += "<br/><i title='Cloud cover' class='midicon wi wi-cloud'></i>: "+Math.round(data.clouds.all)+"%</small><br/><i style='margin-left:-6px;' title='Visibility' class='midicon material-icons'>remove_red_eye</i>: "+(Math.round(data.visibility/100)/10)+"<span>km</span></p>\n"
+    html += "<br style='margin-bottom:18px;'/><i style='margin-left:-6px;' title='Visibility' class='midicon material-icons'>remove_red_eye</i>"+(Math.round(data.visibility/100)/10)+"<span>km</span></p>\n"
     html += "</div>\n"
-    html += "<div class='col2'>\n"
-    html += "<p><br/><i title='Winds from "+Math.round(data.wind.deg)+"°' class='windicon wi wi-wind from-"+Math.round(data.wind.deg)+"-deg'></i><br/><span class='wind' style='margin:-4px 0;display:block;'>"+Math.round(data.wind.deg)+"°</span class='wind'><br/><span class='wind' style='margin-top:-14px;display:block;'>"+Math.round(data.wind.speed*1.944)+"kn</span class='wind'></p>\n"
+    html += "<div class='col2 nobg'>\n"
+    html += "<p><br/><i style='color:black' title='Winds from "+Math.round(data.wind.deg)+"°' class='windicon wi wi-wind from-"+Math.round(data.wind.deg)+"-deg'></i><br/><span class='wind' style='margin:-4px 0;display:block;font-size:120%;margin-bottom:0px'>"+Math.round(data.wind.deg)+"°</span><br/><span class='wind' style='margin-top:-14px;display:block;'>"+Math.round(data.wind.speed*1.944)+"kn</span class='wind'></p>\n"
     html += "</div>\n"
     //html += "<div class='col nobg'>&nbsp;</div>\n"
     html += "</div>\n"
@@ -712,14 +709,17 @@ $(document).ready(function(){
         }
         day = wtime.getDate();
         html += "</div>\n"
-        html += "<div class='flex-grid'>\n"
-        html += "<div class='col nobg'><p style='text-align: right;font-size:125%;line-height: 100%;'>"+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][wtime.getDay()]+"<br/>"+wtime.getDate()+"/"+(wtime.getMonth()+1)+"</p></div>";
-        for (i=0; i<gap; i++) { html += "<div class='col nobg'>&nbsp;</div\n>"; }
+        html += "<div class='flex-grid' style='margin-bottom:-20px;'>\n"
+        html += "<div class='col nobg'><p style='text-align: left; font-size:125%;line-height: 100%;'>"+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][wtime.getDay()]+" <b style='font-size:110%;'>"+wtime.getDate()+"</b>/"+(wtime.getMonth()+1);
+        if (i == 0) html += " <small>(Today)</small>";
+        html += "</p></div>";
+        html += "</div><div class='flex-grid'>\n"
+        for (i=0; i<gap; i++) { html += "<div class='col' style='padding:0; background:rgba(255,255,255,"+((1+i)/(1+gap))+");'>&nbsp;</div\n>"; }
         hour = 0
       }
 
-      html += "<div class='col'>\n"
-      html += "<p><b style='text-align:center;'>"+wtime.getHours()+"</b><b class='hide-on-small'>:00</b></p>\n"
+      html += "<div class='col' style='padding:0'>\n"
+      html += "<p><b style='text-align:center;'>"+pad(wtime.getHours(),2)+"</b><sup><small>00</small></sup></p>\n"
       html += "<p><i title='"+e.weather[0].description+"' class='wi wi-owm-"+e.weather[0].id+"'></i></p>"
       html += "<p style='margin:-12px 0 -6px;'>"+Math.round(e.main.temp)+"°<small class='hide-on-small'>C</small></p>\n"
       html += "<p style='margin: 0 -6px;'><small>"+Math.round(e.main.pressure)+"<small class='hide-on-small'>hPa</small></small></p>\n"
