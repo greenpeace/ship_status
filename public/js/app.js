@@ -299,38 +299,24 @@ function drawGauge() {
     tws[50] = warrow.polygon("0,"+(-edge*0.4)+" 0,"+(-edge*0.47)+" "+edge*0.07+","+(-edge*0.48)).fill("#c00").stroke({color:"#c00",width:4,linecap:"round"});
     wspeed(parseFloat($("#TWS").text().replace(/[^\d\.]/,"")));
 
-    gg.svg(rw3raw);
+    grw = gg.group()
+    grw.svg(rw3raw);
     rw3s = SVG.get("rw3");
-    rw3s.scale(edge/200,0,0);
+    rw3s.center(0,0).scale(edge/200,0,0);
     //rw3s.children()[0].attr("transform","translate(0,0)")
-    //rw3s.rotate(hdg,0,0);
+    grw.rotate(hdg,0,0);
     //rw3s.children()[0].attr("transform","rotate("+hdg+",0,0)")
-    rw3s.children()[0].children()[0].rotate(hdg,0,0);
+    //rw3s.children()[0].children()[0].rotate(hdg,0,0);
     carrow.rotate(cog,0,0);
     harrow.rotate(hdg,0,0);
 
     satg = gg.group();
-    $.each(sats,function(i,e){
-      if (e.alt > 0) {
-        block = Math.min(Math.floor(Math.min(Math.abs(151 - (e.az - hdg) % 360),e.alt) / 2), 10);
-        scale = ["#F5001A", "#F31F08", "#F2560F", "#F18A17", "#F0B91F", "#EFE527", "#CFEE2F", "#A9ED36", "#86EC3E", "#67EB45", "#4CEA4E"]
-        color = scale[block]
-        sat = satg.circle(8)
-          .attr("data-beam",e.beamname)
-          .attr("data-id",e.id)
-          .attr("class","sat")
-          .center(0,-0.5 * edge * Math.cos(e.alt / 180 * Math.PI))
-          .rotate(parseInt(e.az),0,0)
-          .fill(color)
-          .stroke({color: "#000", width:e.active == 1 ? 2 : 0.2})
-      }
-    })
     if (sm.sun.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.sun.alt/180*Math.PI)).rotate(parseInt(sm.sun.az),0,0).fill("#FC8").stroke({color:"#FFC",width:2});
     if (sm.moon.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.moon.alt/180*Math.PI)).rotate(parseInt(sm.moon.az),0,0).fill("#AAA").stroke({color:"#CCC",width:2});
 
   } else {
-    //rw3s.rotate(hdg,0,0);
-    rw3s.children()[0].children()[0].rotate(hdg,00,00);
+    grw.rotate(hdg,0,0);
+    //rw3s.children()[0].children()[0].rotate(hdg,00,00);
     //rw3s.attr("transform","rotate("+hdg+",0,0)")
     //rw3s.children()[0].attr("transform","rotate("+hdg+",0,0)")
     carrow.rotate(cog,0,0);
@@ -339,6 +325,25 @@ function drawGauge() {
     wspeed(parseFloat($("#TWS").text().replace(/[^\d\.]/,"")));
     //rw3s.animate().rotate(hdg,0,0);
     //warrow.animate().rotate(twa,0,0);
+    $.each(sats,function(i,e){
+      $("#sat-"+e.id).remove();
+      if (e.alt > 0) {
+        block = Math.min(Math.floor(Math.min(Math.abs(151 - (e.az - hdg) % 360),e.alt) / 2), 10);
+        scale = ["#F5001A", "#F31F08", "#F2560F", "#F18A17", "#F0B91F", "#EFE527", "#CFEE2F", "#A9ED36", "#86EC3E", "#67EB45", "#4CEA4E"]
+        color = scale[block]
+        sat = satg.circle(8)
+          .attr("id","sat-"+e.id)
+          .attr("data-beam",e.beamname)
+          .attr("data-id",e.id)
+          .attr("class","sat")
+          .center(0,-0.5 * edge * Math.cos(e.alt / 180 * Math.PI))
+          .rotate(parseInt(e.az),0,0)
+          .fill(color)
+          .stroke({color: "#000", width:e.active == 1 ? 2 : 0.2})
+        $("#sat-"+e.id).append(document.createElementNS("http://www.w3.org/2000/svg", 'title'));
+        $("#sat-"+e.id+" title").text(e.beamname+"\n#" + e.id + " AZ:" + Math.round(e.az*10)/10 + ", ALT:" + Math.round(e.alt*10)/10+", BRG:"+Math.round(((e.az - hdg)%360)*10)/10)
+      }
+    })
   }
 }
 
@@ -429,12 +434,27 @@ function popSVG(type,data,max,period,elem) {
   } else {
     svgelem.line("0,40 "+(width)+",40").stroke("#aaa").fill("none")
     svgelem.text("180°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,32)
-    svgelem.line("0,90 "+(width)+",90").stroke({color:"#aaa",width:0.5}).fill("none")
+    svgelem.line("0,52.5 "+(width)+",52.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,65 "+(width)+",65").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,77.5 "+(width)+",77.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,90 "+(width)+",90").stroke({color:"#aaa",width:1}).fill("none")
+
     svgelem.text("90°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,82)
-    svgelem.line("0,140 "+(width)+",140").stroke({color:"#aaa",width:0.5}).fill("none")
+    svgelem.line("0,102.5 "+(width)+",102.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,115 "+(width)+",115").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,127.5 "+(width)+",127.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,140 "+(width)+",140").stroke({color:"#aaa",width:1}).fill("none")
+
     svgelem.text("000°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,132)
-    svgelem.line("0,190 "+(width)+",190").stroke({color:"#aaa",width:0.5}).fill("none")
+    svgelem.line("0,152.5 "+(width)+",152.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,165 "+(width)+",165").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,177.5 "+(width)+",177.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,190 "+(width)+",190").stroke({color:"#aaa",width:1}).fill("none")
+
     svgelem.text("270°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,182)
+    svgelem.line("0,202.5 "+(width)+",202.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,215 "+(width)+",215").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,227.5 "+(width)+",227.5").stroke({color:"#aaa",width:0.4}).fill("none")
     svgelem.line("0,240 "+(width)+",240").stroke("#aaa").fill("none")
     svgelem.text("180°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,232)
   }
