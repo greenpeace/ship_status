@@ -1,4 +1,4 @@
-var map, zoomInit, index, markercluster, fStatic, fDynamic, rw3, rw3raw, rw3s, warrow, carrow, harrow, wlin, wake, rot, angle, speed, weather, timedelta, POS, SVGdata, SVGdata2, edge;
+var map, zoomInit, index, markercluster, fStatic, fDynamic, rw3, rw3raw, rw3s, warrow, carrow, harrow, wlin, wake, rot, angle, speed, weather, timedelta, POS, SVGdata, SVGdata2, edge, sats, sm;
 var overlays = {};
 var overids = {};
 var fitBoundOpts = {animate:true};
@@ -8,7 +8,7 @@ var basemap = L.tileLayer('/tiles/chart/{z}/{x}/{y}.png', {attribution: '', minZ
 //var openseamap = L.tileLayer.provider('OpenSeaMap', {minZoom: 4, maxZoom: 18, apikey:"819dee1c8f874141ad1f7cec78d2efc5"});
 
 $.get("/img/rw3.svg",function(img) {
-  rw3raw = img.rootElement.outerHTML;
+  rw3raw = "<g> "+img.rootElement.outerHTML+" </g>";
 })
 
 Number.prototype.mod = function(n) {
@@ -250,12 +250,12 @@ function drawGauge() {
   cog = parseInt($("#COG").text().replace(/[^\d\.]/,""));
   twa = parseInt($("#TWA").text().replace(/[^\d\.]/,""));
   if ($("#rw3").length == 0 ) {
-    edge = $("#data-container").height() - 6;
-    if (window.innerWidth < 666) {
-      $("#gauge-container").removeClass("col");
-      return false;
+    if (window.innerWidth >= 559) {
+      edge = $("#data-container").height() - 6;
+    } else {
+      edge = window.innerWidth - 48;
     }
-      $("#gauge-container").addClass("col");
+    $("#gauge-container").addClass("col");
     $("#gauge-container").css("width",edge+6).css("height",edge+6).css("min-width",edge+6).css("min-height",edge+6).css("max-width",edge+6).css("max-height",edge+6);
     $("#gauge").html("").removeClass("hide");
     gauge = SVG("gauge").size(edge+6,edge+6);
@@ -266,17 +266,25 @@ function drawGauge() {
     harrow.line(0,0,0,-edge*0.5).stroke({color:"#060",width:3,linecap:"round"})
     carrow = gg.group();
     carrow.line(0,0,0,-edge*0.5).stroke({color:"#c60",width:3,linecap:"round"})
-    circles = 4
+    gg.circle(edge).attr("id","base").center(0,0).fill("transparent").stroke("none");
+    circles = 6
     for (var i=0; i <= circles; i++) {
-      dt = edge * i / circles;
-      gg.circle(dt).center(0,0).fill("none").stroke({color:"#06c",width:2});
+      dt = edge * Math.cos( i / (circles * 2) * Math.PI )
+      gg.circle(dt).center(0,0).fill("none").stroke({color:"#06c",width:i == 0 ? 2 : i / 2 - 0.5});
     }
     for (var i=0; i < 360; i++) {
       gg.line(0,-edge*0.5,0,(i%15 == 0 ? -edge*0.46 : -edge*0.48)).stroke({color:"#06c",width:(i%5 == 0 ? 0.6 : 0.3) }).rotate(i,0,0);
     }
+
     lines = 4;
-    fsize = edge * 0.04;
+    //fsize = edge * 0.04;
     for (var i=0; i < lines; i++) {
+      //rng = i % 2 == 0 ? 0.5 : 0.4
+      //fs = i % 2 == 0 ? 12 : 10
+      //gg.polygon(edge*0.02+",0 0,"+edge*rng+" "+(-edge*0.02)+",0 0,"+(-edge*rng)).center(0,0).fill("#ddd").stroke({color:"#06c",width:edge * 0.004 }).rotate(180*i/lines,0,0);
+      //gg.polygon(edge*0.02+",0 0,"+edge*rng+" 0,"+(-edge*rng)+" "+(-edge*0.02)+",0" ).center(0,0).fill("#06c").stroke("none").rotate(180*i/lines,0,0);
+      //gg.text(pad(180*i/lines,3)).font({size:fs,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180*i/lines,0,0);
+      //gg.text(pad(180+180*i/lines,3)).font({size:fs,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180+180*i/lines,0,0);
       gg.line(0,edge*0.5,0,-edge*0.5).center(0,0).stroke({color:"#06c",width:1.2}).rotate(180*i/lines,0,0);
       gg.text(pad(180*i/lines,3)).font({size:12,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180*i/lines,0,0);
       gg.text(pad(180+180*i/lines,3)).font({size:12,anchor:"center"}).fill("#06c").center(0,-edge*0.525).rotate(180+180*i/lines,0,0);
@@ -293,24 +301,57 @@ function drawGauge() {
     tws[50] = warrow.polygon("0,"+(-edge*0.4)+" 0,"+(-edge*0.47)+" "+edge*0.07+","+(-edge*0.48)).fill("#c00").stroke({color:"#c00",width:4,linecap:"round"});
     wspeed(parseFloat($("#TWS").text().replace(/[^\d\.]/,"")));
 
-    gg.svg(rw3raw);
+    grw = gg.group()
+    grw.svg(rw3raw);
     rw3s = SVG.get("rw3");
     rw3s.center(0,0).scale(edge/200,0,0);
-    //rw3s.center(0,0);
-    rw3s.rotate(hdg,0,0);
-    //$("#rw3").css("transform","rotate( "+hdg+"deg )")
+    //rw3s.children()[0].attr("transform","translate(0,0)")
+    grw.rotate(hdg,0,0);
+    //rw3s.children()[0].attr("transform","rotate("+hdg+",0,0)")
+    //rw3s.children()[0].children()[0].rotate(hdg,0,0);
     carrow.rotate(cog,0,0);
     harrow.rotate(hdg,0,0);
+
+    satg = gg.group();
+    if (sm.sun.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.sun.alt/180*Math.PI)).rotate(parseInt(sm.sun.az),0,0).fill("#FC8").stroke({color:"#FFC",width:2});
+    if (sm.moon.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.moon.alt/180*Math.PI)).rotate(parseInt(sm.moon.az),0,0).fill("#AAA").stroke({color:"#CCC",width:2});
+
   } else {
-    rw3s.rotate(hdg,0,0);
+    grw.rotate(hdg,0,0);
+    //rw3s.children()[0].children()[0].rotate(hdg,00,00);
+    //rw3s.attr("transform","rotate("+hdg+",0,0)")
+    //rw3s.children()[0].attr("transform","rotate("+hdg+",0,0)")
     carrow.rotate(cog,0,0);
     harrow.rotate(hdg,0,0);
     warrow.rotate(twa,0,0);
     wspeed(parseFloat($("#TWS").text().replace(/[^\d\.]/,"")));
     //rw3s.animate().rotate(hdg,0,0);
     //warrow.animate().rotate(twa,0,0);
+    $.each(sats,function(i,e){
+      $("#sat-"+e.id).remove();
+      if (e.alt > 0) {
+        block = Math.min(Math.floor(Math.min(Math.abs(151 - (e.az - hdg) % 360),e.alt) / 2), 10);
+        scale = ["#F5001A", "#F31F08", "#F2560F", "#F18A17", "#F0B91F", "#EFE527", "#CFEE2F", "#A9ED36", "#86EC3E", "#67EB45", "#4CEA4E"]
+        color = scale[block]
+        sat = satg.circle(8)
+          .attr("id","sat-"+e.id)
+          .attr("data-beam",e.beamname)
+          .attr("data-id",e.id)
+          .attr("class","sat")
+          .center(0,-0.5 * edge * Math.cos(e.alt / 180 * Math.PI))
+          .rotate(parseInt(e.az),0,0)
+          .fill(color)
+          .stroke({color: "#000", width:e.active == 1 ? 2 : 0.2})
+        $("#sat-"+e.id).append(document.createElementNS("http://www.w3.org/2000/svg", 'title'));
+        $("#sat-"+e.id+" title").text(e.beamname+"\n#" + e.id + " AZ:" + Math.round(e.az*10)/10 + ", ALT:" + Math.round(e.alt*10)/10+", BRG:"+Math.round(((e.az - hdg)%360)*10)/10)
+      }
+    })
   }
 }
+
+
+
+
 
 
 
@@ -322,7 +363,7 @@ function popSVG(type,data,max,period,elem) {
   avgmin = "";
   avgmax = "";
   gust = "";
-  if (type == "sog") console.log(data)
+  //if (type == "sog") console.log(data)
   if (max > 0) {
     ratio = 200 / parseFloat(max);
   } else {
@@ -395,12 +436,27 @@ function popSVG(type,data,max,period,elem) {
   } else {
     svgelem.line("0,40 "+(width)+",40").stroke("#aaa").fill("none")
     svgelem.text("180°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,32)
-    svgelem.line("0,90 "+(width)+",90").stroke({color:"#aaa",width:0.5}).fill("none")
+    svgelem.line("0,52.5 "+(width)+",52.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,65 "+(width)+",65").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,77.5 "+(width)+",77.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,90 "+(width)+",90").stroke({color:"#aaa",width:1}).fill("none")
+
     svgelem.text("90°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,82)
-    svgelem.line("0,140 "+(width)+",140").stroke({color:"#aaa",width:0.5}).fill("none")
+    svgelem.line("0,102.5 "+(width)+",102.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,115 "+(width)+",115").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,127.5 "+(width)+",127.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,140 "+(width)+",140").stroke({color:"#aaa",width:1}).fill("none")
+
     svgelem.text("000°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,132)
-    svgelem.line("0,190 "+(width)+",190").stroke({color:"#aaa",width:0.5}).fill("none")
+    svgelem.line("0,152.5 "+(width)+",152.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,165 "+(width)+",165").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,177.5 "+(width)+",177.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,190 "+(width)+",190").stroke({color:"#aaa",width:1}).fill("none")
+
     svgelem.text("270°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,182)
+    svgelem.line("0,202.5 "+(width)+",202.5").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,215 "+(width)+",215").stroke({color:"#aaa",width:0.4}).fill("none")
+    svgelem.line("0,227.5 "+(width)+",227.5").stroke({color:"#aaa",width:0.4}).fill("none")
     svgelem.line("0,240 "+(width)+",240").stroke("#aaa").fill("none")
     svgelem.text("180°").font({size:12,anchor:"left"}).fill("#aaa").move(width+5,232)
   }
@@ -413,7 +469,7 @@ function popSVG(type,data,max,period,elem) {
   } else if (type == "twa") {
     svgelem.polygon(avgmin + avgmax.split(" ").reverse().join(" ")).fill(color).stroke({color:color,width:0}).attr("fill-rule","evenodd")
   } else if (max > 0){
-    svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,380);
+    svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,480);
   } else {
     svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,380);
   }
@@ -537,9 +593,14 @@ $(document).ready(function(){
     })
   })
 
+  $.getJSON(domain+"/data/sunmoon.json?"+new Date().getTime(),function(data){
+    sm = data;
+  })
+
   $.getJSON(domain+"/data/sat.json?"+new Date().getTime(),function(data){
     tb = $("#sky tbody");
     tb.html("");
+    sats = data;
     $.each(data,function(k,v){
       dist = String(parseInt(v["range"]/1000));
       vv = [v["id"],v["satname"],/*v["beamname"],*/v["sublat"].toFixed(2),v["sublon"].toFixed(2)+" ("+v["catlon"]+")",v["alt"].toFixed(2),v["az"].toFixed(2),dist.substr(0,2)+","+dist.substr(2,3)]
@@ -611,21 +672,21 @@ $(document).ready(function(){
     delta = time.getTimezoneOffset()
     wtime = new Date(data.dt * 1000 + (timedelta * 60 + delta) * 60000);
     html = "<div class='flex-grid'>"
-    html += "<div class='col nobg'>&nbsp;</div>\n"
-    html += "<div class='col2 nobg'>\n"
+    //html += "<div class='col nobg'>&nbsp;</div>\n"
+    html += "<div class='col nobg'>\n"
     html += "<p class='leftie'>"+data.name+", "+data.sys.country+"<br/>\n"
     html += "<b>"+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][wtime.getDay()]+" "+["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][wtime.getMonth()]+"&nbsp;"+wtime.getDate()+", </b>\n"
     html += "<b>"+wtime.getHours()+":"+(wtime.getMinutes() == 0 ? "00" : wtime.getMinutes())+"</b><br/><small class='attr'>openweathermap.org</small></p>\n"
     html += "</div>\n"
-    html += "<div class='col2'>\n"
-    html += "<p><br/><i class='huge wi wi-owm-"+data.weather[0].id+"'></i><br/><span style='margin-top:12px;display:block;'>"+data.weather[0].description+"</span></p>"
+    html += "<div class='col2 nobg'>\n"
+    html += "<p><br/><i class='huge wi wi-owm-"+data.weather[0].id+"'></i><br/><span style='margin-top:12px;display:block;'>"+data.weather[0].description+"</span><br/><i title='Cloud cover' class='midicon wi wi-cloud'></i>"+Math.round(data.clouds.all)+"<small>%</small></p>"
     html += "</div>\n"
-    html += "<div class='col2'>\n"
+    html += "<div class='col2 nobg'>\n"
     html += "<p class='middle'><br/><b class='temp'>"+Math.round(data.main.temp)+"°C</b><br/>"+Math.round(data.main.pressure)+"<span>hPa</span>\n"
-    html += "<br/><i title='Cloud cover' class='midicon wi wi-cloud'></i>: "+Math.round(data.clouds.all)+"%</small><br/><i style='margin-left:-6px;' title='Visibility' class='midicon material-icons'>remove_red_eye</i>: "+(Math.round(data.visibility/100)/10)+"<span>km</span></p>\n"
+    html += "<br style='margin-bottom:18px;'/><i style='margin-left:-6px;' title='Visibility' class='midicon material-icons'>remove_red_eye</i>"+(Math.round(data.visibility/100)/10)+"<span>km</span></p>\n"
     html += "</div>\n"
-    html += "<div class='col2'>\n"
-    html += "<p><br/><i title='Winds from "+Math.round(data.wind.deg)+"°' class='windicon wi wi-wind from-"+Math.round(data.wind.deg)+"-deg'></i><br/><span class='wind' style='margin:-4px 0;display:block;'>"+Math.round(data.wind.deg)+"°</span class='wind'><br/><span class='wind' style='margin-top:-14px;display:block;'>"+Math.round(data.wind.speed*1.944)+"kn</span class='wind'></p>\n"
+    html += "<div class='col2 nobg'>\n"
+    html += "<p><br/><i style='color:black' title='Winds from "+Math.round(data.wind.deg)+"°' class='windicon wi wi-wind from-"+Math.round(data.wind.deg)+"-deg'></i><br/><span class='wind' style='margin:-4px 0;display:block;font-size:120%;margin-bottom:0px'>"+Math.round(data.wind.deg)+"°</span><br/><span class='wind' style='margin-top:-14px;display:block;'>"+Math.round(data.wind.speed*1.944)+"kn</span class='wind'></p>\n"
     html += "</div>\n"
     //html += "<div class='col nobg'>&nbsp;</div>\n"
     html += "</div>\n"
@@ -648,14 +709,17 @@ $(document).ready(function(){
         }
         day = wtime.getDate();
         html += "</div>\n"
-        html += "<div class='flex-grid'>\n"
-        html += "<div class='col nobg'><p style='text-align: right;font-size:125%;line-height: 100%;'>"+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][wtime.getDay()]+"<br/>"+wtime.getDate()+"/"+(wtime.getMonth()+1)+"</p></div>";
-        for (i=0; i<gap; i++) { html += "<div class='col nobg'>&nbsp;</div\n>"; }
+        html += "<div class='flex-grid' style='margin-bottom:-20px;'>\n"
+        html += "<div class='col nobg'><p style='text-align: left; font-size:125%;line-height: 100%;'>"+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][wtime.getDay()]+" <b style='font-size:110%;'>"+wtime.getDate()+"</b>/"+(wtime.getMonth()+1);
+        if (i == 0) html += " <small>(Today)</small>";
+        html += "</p></div>";
+        html += "</div><div class='flex-grid'>\n"
+        for (i=0; i<gap; i++) { html += "<div class='col' style='padding:0; background:rgba(255,255,255,"+((1+i)/(1+gap))+");'>&nbsp;</div\n>"; }
         hour = 0
       }
 
-      html += "<div class='col'>\n"
-      html += "<p><b style='text-align:center;'>"+wtime.getHours()+"</b><b class='hide-on-small'>:00</b></p>\n"
+      html += "<div class='col' style='padding:0'>\n"
+      html += "<p><b style='text-align:center;'>"+pad(wtime.getHours(),2)+"</b><sup><small>00</small></sup></p>\n"
       html += "<p><i title='"+e.weather[0].description+"' class='wi wi-owm-"+e.weather[0].id+"'></i></p>"
       html += "<p style='margin:-12px 0 -6px;'>"+Math.round(e.main.temp)+"°<small class='hide-on-small'>C</small></p>\n"
       html += "<p style='margin: 0 -6px;'><small>"+Math.round(e.main.pressure)+"<small class='hide-on-small'>hPa</small></small></p>\n"

@@ -1,5 +1,6 @@
 /lib/.sass-cache
 /public/data/*
+/lib/vsat/speedtests/*
 .rvmrc
 Gemfile.lock
 **/.~*

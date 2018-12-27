@@ -7,8 +7,10 @@ require 'pp'
 $avg_period = 180
 
 $decoder = NMEAPlus::Decoder.new
-$streamSock = TCPSocket.new( "192.168.212.8", 7004 )  
-$windSock = TCPSocket.new( "192.168.212.8", 7008 )  
+$streamSock = TCPSocket.new( "192.168.212.8", 7004 )
+$windSock = TCPSocket.new( "192.168.212.8", 7008 )
+$aisSock = TCPSocket.new( "192.168.212.8", 7006 )
+$VESSEL_MMSI = "244690000"
 $pos = []
 $t0 = Time.now - 60
 $rwa = []
@@ -324,6 +326,51 @@ def receive_wind
   end
 end
 
+def receive_ais
+  raw = $aisSock.recv(4096 * 2)
+  source_decoder = NMEAPlus::SourceDecoder.new(raw)
+  begin
+    res = JSON.parse(File.read("/var/www/gauge/public/data/nmea.json"))
+  rescue
+    res = {}
+  end
+  res[:ts] = Time.now.to_i
+  source_decoder.each_complete_message do |msg|
+    begin
+      next unless [1,2,3,5].include?(msg.ais.message_type)
+      # pp [msg.ais.source_mmsi, msg.ais.get_navigational_status_description(msg.ais.navigational_status)]
+      next unless msg.ais.source_mmsi.to_s == $VESSEL_MMSI
+      begin
+        if [1,2,3].include?(msg.ais.message_type)
+          res["AIS"] = {} unless res.has_key?("AIS")
+          res["AIS"]["status_id"] = msg.ais.navigational_status
+          res["AIS"]["status_name"] = msg.ais.get_navigational_status_description(msg.ais.navigational_status)
+          res["AIS"]["timestamp"] = Time.now.to_i
+        elsif msg.ais.message_type == 5
+          res["AIS"] = {} unless res.has_key?("AIS")
+          res["AIS"]["eta"] = msg.ais.eta
+          res["AIS"]["destination"] = msg.ais.destination
+          res["AIS"]["timestamp"] = Time.now.to_i
+        end
+      rescue
+        pp "Error: #{msg}"
+        pp msg.ais.source_mmsi if msg
+      end
+    rescue
+      pp "Error: #{msg}"
+      pp msg.ais.source_mmsi if msg
+    end
+  end
+  if res.has_key?("AIS")
+    begin
+      File.open("/var/www/gauge/public/data/nmea.json","w") do |file|
+        file << res.to_json
+      end
+    rescue
+    end
+  end
+end
+
 def polar2cart a, r=nil
   a, r = *a unless r
   x = Math.cos( a / 180.0 * Math::PI ) * r
@@ -365,9 +412,10 @@ loop do
     sleep 1
     receive_gps
     receive_wind
+    receive_ais
     print "#{((Time.now - $t0)*100).to_i / 100.0} secs elapsed. "
   rescue SystemExit, Interrupt
-=begin
+#=begin
     print "\r"
     pp $res
     puts
@@ -375,11 +423,12 @@ loop do
     p $twa
     p $rws
     p $tws
-=end
+#=end
     exit 0
   end
 end
 
 $streamSock.close  
 $windSock.close  
+$aisSock.close  
 
