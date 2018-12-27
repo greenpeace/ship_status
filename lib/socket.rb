@@ -365,6 +365,7 @@ loop do
     sleep 1
     receive_gps
     receive_wind
+    print "#{((Time.now - $t0)*100).to_i / 100.0} secs elapsed. "
   rescue SystemExit, Interrupt
 =begin
     print "\r"

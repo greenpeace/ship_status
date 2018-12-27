@@ -27,7 +27,6 @@ td = (tz.seconds / 3600.0) * hour
 
 months = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 
-print ''
 normal = Observer()
 normal.lat = lat
 normal.lon = lon
