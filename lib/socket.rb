@@ -1,15 +1,15 @@
 require '/var/www/gauge/lib/util.rb'
 require "nmea_plus"  
-require "socket"
+require "tcp_timeout"
 require "json"
 require 'pp'  
 
 $avg_period = 180
 
 $decoder = NMEAPlus::Decoder.new
-$streamSock = TCPSocket.new( "192.168.212.8", 7004 )
-$windSock = TCPSocket.new( "192.168.212.8", 7008 )
-$aisSock = TCPSocket.new( "192.168.212.8", 7006 )
+$streamSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7004, read_timeout: 1)
+$windSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7008, read_timeout: 1)
+$aisSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7006, read_timeout: 1)
 $VESSEL_MMSI = "244690000"
 $pos = []
 $t0 = Time.now - 60
@@ -173,7 +173,11 @@ def log data
 end
 
 def receive_gps
-  raw = $streamSock.recv(4096)
+  begin
+    raw = $streamSock.read(4096)
+  rescue
+    return false
+  end
   cut = raw.match(/\r\n$/).nil?
   sentences = raw.split(/\r\n/)
   sentences.pop if cut
@@ -222,7 +226,11 @@ def receive_gps
 end
 
 def receive_wind
-  raw = $windSock.recv(4096)
+  begin
+    raw = $windSock.read(4096)
+  rescue
+    return false
+  end
   cut = raw.match(/\r\n$/).nil?
   sentences = raw.split(/\r\n/)
   sentences.pop if cut
@@ -327,7 +335,11 @@ def receive_wind
 end
 
 def receive_ais
-  raw = $aisSock.recv(4096 * 2)
+  begin
+    raw = $aisSock.read(4096)
+  rescue
+    return false
+  end
   source_decoder = NMEAPlus::SourceDecoder.new(raw)
   begin
     res = JSON.parse(File.read("/var/www/gauge/public/data/nmea.json"))
