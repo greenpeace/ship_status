@@ -7,8 +7,8 @@ require 'pp'
 $avg_period = 180
 
 $decoder = NMEAPlus::Decoder.new
-$streamSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7004, read_timeout: 1)
-$windSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7008, read_timeout: 1)
+$streamSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7004, read_timeout: 6)
+$windSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7008, read_timeout: 12)
 $aisSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7006, read_timeout: 1)
 $VESSEL_MMSI = "244690000"
 $pos = []
@@ -23,6 +23,7 @@ $lss = []
 $png = {}
 
 File.open("/var/www/gauge/public/data/nmea.json","w"){|f|f<<"{}"} unless File.exists?("/var/www/gauge/public/data/nmea.json")
+File.open("/var/www/gauge/public/data/nmea.json","w"){|f|f<<"{}"} if File.read("/var/www/gauge/public/data/nmea.json").strip == ""
 
 $dict = { 
           "HDM"=>"Heading - Magnetic Actual vessel heading in degrees Magnetic.",
@@ -147,6 +148,8 @@ def log data
 
       if (data.has_key?("DPT") and data["DPT"].has_key?("depth_meters")) 
         row << (data["DPT"]["depth_meters"] + 2.1).round(1)
+      elsif (data.has_key?("DBT") and data["DBT"].has_key?("depth_meters")) 
+        row << (data["DBT"]["depth_meters"] + 2.1).round(1)
       else
         row << nil
       end
@@ -174,7 +177,7 @@ end
 
 def receive_gps
   begin
-    raw = $streamSock.read(4096)
+    raw = $streamSock.read(1024)
   rescue
     return false
   end
@@ -227,8 +230,9 @@ end
 
 def receive_wind
   begin
-    raw = $windSock.read(4096)
-  rescue
+    raw = $windSock.read(512)
+  rescue => e
+    puts e
     return false
   end
   cut = raw.match(/\r\n$/).nil?
@@ -242,6 +246,7 @@ def receive_wind
   end
   res[:ts] = Time.now.to_i
   sentences.reverse.each_with_index do |sentence|
+    puts sentence
     begin
       msg = $decoder.parse(sentence)
       next if msg.talker == "AI"
@@ -269,11 +274,15 @@ def receive_wind
           $twa.shift while $twa.length > $avg_period
           $res[mt] += 1
         end
+      elsif ["DPT","DBT"].include?(mt) and msg.depth_meters
+        mt = "DPT"
+        res[mt] = {'desc' => $dict[mt], 'depth_meters' => msg.depth_meters}
       end
       #puts
       #puts "#{mt}: #{$dict[mt]}"
       msg.methods.each do |method|
         break if method == :message_type
+        next if ["DPT","DBT"].include?(mt)
         #puts "#{method}: #{eval("msg.#{method}")}"
         res[mt][method.to_s] = eval("msg.#{method}")
       end
@@ -425,7 +434,7 @@ loop do
     receive_gps
     receive_wind
     receive_ais
-    print "\r#{((Time.now - $t0 - 60)*100).to_i / 100.0} secs elapsed. "
+    #print "\r#{((Time.now - $t0 - 60)*100).to_i / 100.0} secs elapsed. "
   rescue SystemExit, Interrupt
 #=begin
     print "\r"

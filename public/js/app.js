@@ -4,8 +4,9 @@ var overids = {};
 var fitBoundOpts = {animate:true};
 var track = [];
 var tws = {};
-var basemap = L.tileLayer('/tiles/chart/{z}/{x}/{y}.png', {attribution: '', minZoom: 4, maxZoom: 18, });
-//var openseamap = L.tileLayer.provider('OpenSeaMap', {minZoom: 4, maxZoom: 18, apikey:"819dee1c8f874141ad1f7cec78d2efc5"});
+//var basemap = L.tileLayer('/tiles/chart/{z}/{x}/{y}.png', {attribution: '', minZoom: 4, maxZoom: 18, });
+var basemap = L.tileLayer.provider('OpenTopoMap', {minZoom: 4, maxZoom: 17});
+var openseamap = L.tileLayer.provider('OpenSeaMap', {minZoom: 4, maxZoom: 17, apikey:"819dee1c8f874141ad1f7cec78d2efc5"});
 
 $.get("/img/rw3.svg",function(img) {
   rw3raw = "<g> "+img.rootElement.outerHTML+" </g>";
@@ -30,7 +31,7 @@ function initMap() {
   })
 
   basemap.addTo(map)
-  //openseamap.addTo(map)
+  openseamap.addTo(map)
 
   map.removeControl(map.zoomControl)
   L.control.zoom({position: 'topright'}).addTo(map);
@@ -82,8 +83,10 @@ function initMap() {
     }
   })
 
-  $.get(domain+"/data/track.csv?"+new Date().getTime(),function(data){
-    track = $.map(data.split(/\n/).reverse(),function(e,i){
+  $.get(domain+"/track.csv?"+new Date().getTime(),function(data){
+      data = data.split(/\n/);
+      console.log(data.length)
+    track = $.map(data.reverse(),function(e,i){
       a = e.split(/\s*,\s*/)
       if (e.length > 10) return [new L.LatLng(parseFloat(a[1]),parseFloat(a[2]))];
     });
@@ -197,7 +200,13 @@ function render() {
   if (has_key(NMEA,"MWV-t")) $("#TWS").html(NMEA["MWV-t"].wind_speed+"<small>kn</small>");
   if (has_key(NMEA,"MWV-r")) $("#AWA").html(NMEA["MWV-r"].wind_angle+"°");
   if (has_key(NMEA,"MWV-r")) $("#AWS").html(NMEA["MWV-r"].wind_speed+"<small>kn</small>");
-  if (has_key(NMEA,"DPT"))   $("#DPT").html(NMEA.DPT.depth_meters+"<small>m</small>");
+  if (has_key(NMEA,"DPT") && NMEA.DPT.depth_meters != null) { 
+    $("#DPT").closest("div.flex-grid").show();
+    $("#DPT").html(NMEA.DPT.depth_meters+"<small>m</small>");
+  } else {
+    $("#DPT").closest("div.flex-grid").hide();
+    $("#DPT").html("");
+  }
   if (has_key(NMEA,"GGA") && new_track.length > 0 && parseFloat(NMEA.GGA.latitude.toFixed(track_precision)) == new_track[0] && parseFloat(NMEA.GGA.longitude.toFixed(track_precision)) == new_track[1]) {
     $("#LAT").text(deg_to_dms(NMEA.GGA.latitude,"NS"));
     $("#LON").text(deg_to_dms(NMEA.GGA.longitude,"EW"));
@@ -266,11 +275,11 @@ function drawGauge() {
     harrow.line(0,0,0,-edge*0.5).stroke({color:"#060",width:3,linecap:"round"})
     carrow = gg.group();
     carrow.line(0,0,0,-edge*0.5).stroke({color:"#c60",width:3,linecap:"round"})
-    gg.circle(edge).attr("id","base").center(0,0).fill("transparent").stroke("none");
+    gg.circle(Math.abs(edge)).attr("id","base").center(0,0).fill("transparent").stroke("none");
     circles = 6
     for (var i=0; i <= circles; i++) {
       dt = edge * Math.cos( i / (circles * 2) * Math.PI )
-      gg.circle(dt).center(0,0).fill("none").stroke({color:"#06c",width:i == 0 ? 2 : i / 2 - 0.5});
+      gg.circle(Math.abs(dt)).center(0,0).fill("none").stroke({color:"#06c",width:i == 0 ? 2 : i / 2 - 0.5});
     }
     for (var i=0; i < 360; i++) {
       gg.line(0,-edge*0.5,0,(i%15 == 0 ? -edge*0.46 : -edge*0.48)).stroke({color:"#06c",width:(i%5 == 0 ? 0.6 : 0.3) }).rotate(i,0,0);
@@ -292,7 +301,7 @@ function drawGauge() {
     warrow = gg.group();
     wlin = warrow.line(0,0,0,-edge*0.4).fill("none").stroke({color:"#c00",width:3,linecap:"round"});
     warrow.rotate(parseInt($("#TWA").text().replace(/[^\d\.]/,"")),0,0);
-    tws[0] = warrow.circle(edge*0.25).center(0,0).fill("none").stroke({color:"#c00",width:3});
+    tws[0] = warrow.circle(Math.abs(edge*0.25)).center(0,0).fill("none").stroke({color:"#c00",width:3});
     for (var i=10; i<=50; i+=10) {
       dt = edge * 0.002 * (i-10);
       tws[i-5] = warrow.line(0,-edge*0.4+dt,edge*0.04,-edge*0.41+dt).fill("none").stroke({color:"#c00",width:3,linecap:"round"});
@@ -313,8 +322,10 @@ function drawGauge() {
     harrow.rotate(hdg,0,0);
 
     satg = gg.group();
-    if (sm.sun.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.sun.alt/180*Math.PI)).rotate(parseInt(sm.sun.az),0,0).fill("#FC8").stroke({color:"#FFC",width:2});
-    if (sm.moon.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.moon.alt/180*Math.PI)).rotate(parseInt(sm.moon.az),0,0).fill("#AAA").stroke({color:"#CCC",width:2});
+    if (typeof sm != "undefined") {
+      if (sm.sun.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.sun.alt/180*Math.PI)).rotate(parseInt(sm.sun.az),0,0).fill("#FC8").stroke({color:"#FFC",width:2});
+      if (sm.moon.alt > 0) satg.circle(12).center(0,-0.5 * edge * Math.cos(sm.moon.alt/180*Math.PI)).rotate(parseInt(sm.moon.az),0,0).fill("#AAA").stroke({color:"#CCC",width:2});
+    }
 
   } else {
     grw.rotate(hdg,0,0);

@@ -20,6 +20,10 @@ get "/csv/:type/:period/?" do
   parse_csv params[:type], params[:period].to_i
 end
 
+get "/track.csv/?" do 
+  `tail -n 65536 #{Dir.pwd}/public/data/track.csv`
+end
+
 post "/board/?" do 
   File.open("#{Dir.pwd}/public/data/board.txt","a") do |file|
     file << "<hr/><p>#{params['text']}</p>"
