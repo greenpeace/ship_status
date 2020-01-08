@@ -7,9 +7,9 @@ require 'pp'
 $avg_period = 180
 
 $decoder = NMEAPlus::Decoder.new
-$streamSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7004, read_timeout: 6)
-$windSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7008, read_timeout: 12)
-$aisSock = TCPTimeout::TCPSocket.new( "192.168.212.8", 7006, read_timeout: 1)
+$streamSock = TCPTimeout::TCPSocket.new( "192.168.212.17", 7004, read_timeout: 6)
+$windSock = TCPTimeout::TCPSocket.new( "192.168.212.17", 7008, read_timeout: 12)
+$aisSock = TCPTimeout::TCPSocket.new( "192.168.212.17", 7006, read_timeout: 1)
 $VESSEL_MMSI = "244690000"
 $pos = []
 $t0 = Time.now - 60
@@ -147,12 +147,14 @@ def log data
 =end
 
       if (data.has_key?("DPT") and data["DPT"].has_key?("depth_meters")) 
-        row << (data["DPT"]["depth_meters"] + 2.1).round(1)
+        pp [(data["DPT"]["depth_meters"] + 1.2).round(1)]
+        row << (data["DPT"]["depth_meters"] + 1.2).round(1)
       elsif (data.has_key?("DBT") and data["DBT"].has_key?("depth_meters")) 
-        row << (data["DBT"]["depth_meters"] + 2.1).round(1)
+        row << (data["DBT"]["depth_meters"] + 1.2).round(1)
       else
         row << nil
       end
+      p [[[row.length]]]
 
 =begin
       row << data["PNG"]["alt"].round(2)

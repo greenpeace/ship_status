@@ -56,14 +56,15 @@ $description = "Let the crew know \"where the fuck they are!\""
 def parse_csv type, period
   type.downcase!
   radial = {"hdg"=>3,"cog"=>4,"alt"=>22,"ber"=>23,"rwa"=>9}
-  scalar = {"sog"=>5,"stw"=>6,"tws"=>8,"rws"=>10,"rtt"=>18,"lss"=>20,"dpt"=>21}
+  scalar = {"sog"=>5,"stw"=>6,"tws"=>8,"rws"=>10,"rtt"=>18,"lss"=>20,"dpt"=>18}
   scope = period * 60
   batch = (scope / 480.0).round
   batch == 0 ? batch = 1 : batch = batch
   result = []
   max = scalar.keys.include?(type) ? 0 : nil
 
-  File.readlines("/var/www/gauge/public/data/log.csv").reverse[0..(scope-1)].map{|x| x.strip.split(/\s*,\s*/)}.each_slice(batch) do |a| 
+  #File.readlines("/var/www/gauge/public/data/log.csv").reverse[0..(scope-1)].map{|x| x.strip.split(/\s*,\s*/)}.each_slice(batch) do |a| 
+  (`tail -n #{scope-1} #{Dir.pwd}/public/data/log.csv`.split(/\n/)-[""]).reverse.map{|x| x.strip.split(/\s*,\s*/)}.each_slice(batch) do |a| 
     data = []
     if type == "tws"
       sd = a.map{|x| x[13].to_f}.avg.round(2)
@@ -74,7 +75,8 @@ def parse_csv type, period
       data << (avg + sd).round(2)
       data << gust
     elsif scalar.keys.include? type
-      data << a.map{|x| x[scalar[type]].to_f}.avg.round(2)
+      #puts "#{type}: #{a.to_s}"
+      data << a.map{|x| y = x[scalar[type]].to_f; p y; y}.avg.round(2)
       max = (max > data.last ? max : data.last)
     elsif type == "twa"
       sd = a.map{|x| x[17].to_f}.avg.round(2) * 12
@@ -87,6 +89,7 @@ def parse_csv type, period
     result << data
   end
 
+  p :max=>max,:data=>result.reverse
   {:max=>max,:data=>result.reverse}.to_json
 
 end

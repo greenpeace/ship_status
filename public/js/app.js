@@ -479,6 +479,8 @@ function popSVG(type,data,max,period,elem) {
     svgelem.polyline(gust).stroke({color:"#060",width:0.3}).fill("none")
   } else if (type == "twa") {
     svgelem.polygon(avgmin + avgmax.split(" ").reverse().join(" ")).fill(color).stroke({color:color,width:0}).attr("fill-rule","evenodd")
+  } else if (max > 0 && type == "dpt"){
+    svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,550);
   } else if (max > 0){
     svgelem.polyline(avgmin).stroke({color:color,width:2}).fill("none").flip("y",0).translate(0,480);
   } else {
@@ -528,6 +530,7 @@ function update(element) {
       type2 = $("select#reading2 option:selected").val();
       period = $("#period").val();
       $.getJSON(domain+"/csv/"+type+"/"+period+"?"+new Date().getTime(),function(data){
+        console.log(data)
         SVGdata = [type,data.data, data.max, period];
         popSVG(type,data.data, data.max, period, "show");
         if (type2 != "") {
@@ -581,9 +584,9 @@ $(document).ready(function(){
     $('.button-collapse').sideNav('hide',function(){
       $('.button-collapse').sideNav('show');
     });
-    if ( SVGdata.length == 4 ) { popSVG(SVGdata[0],SVGdata[1], SVGdata[2], SVGdata[3], "show"); }
-    if ( SVGdata2.length == 4 ) { popSVG(SVGdata2[0],SVGdata2[1], SVGdata2[2], SVGdata2[3], "show2"); }
-    if ( SVGdata3.length == 4 ) { popSVG(SVGdata2[0],SVGdata2[1], SVGdata2[2], SVGdata2[3], "show3"); }
+    if ( SVGdata && SVGdata.length == 4 ) { popSVG(SVGdata[0],SVGdata[1], SVGdata[2], SVGdata[3], "show"); }
+    if ( SVGdata2 && SVGdata2.length == 4 ) { popSVG(SVGdata2[0],SVGdata2[1], SVGdata2[2], SVGdata2[3], "show2"); }
+    if ( SVGdata3 && SVGdata3.length == 4 ) { popSVG(SVGdata2[0],SVGdata2[1], SVGdata2[2], SVGdata2[3], "show3"); }
   })
 
   $("#update").on("click", function(event) {
